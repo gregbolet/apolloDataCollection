@@ -38,7 +38,13 @@ def main():
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
-		oraclepath = exedir+'/'+progsuffix[1:]+'-VA-oracle'
+		oraclepath = exedir+'/'+progsuffix[1:]
+
+		if args.usePA:
+			oraclepath += '-PA-oracle'
+		else:
+			oraclepath += '-VA-oracle'
+
 		try:
 			print('Making:', oraclepath)
 			os.mkdir(oraclepath)
