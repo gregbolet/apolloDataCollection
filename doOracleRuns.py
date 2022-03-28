@@ -7,8 +7,6 @@ import subprocess
 # policies. This will allow us to then parse the TRACE_CSV files to quantify
 # whether there is potential for speedup by adjusting thread counts
 
-create_dataset_script='/g/g15/bolet1/workspace/apollo/src/python/modeling/create-dataset.py'
-
 progs={
 			 'nas_bt':{'exedir':'/g/g15/bolet1/workspace/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin',
 							   'exe':'',
@@ -216,6 +214,28 @@ progs={
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
 
+envvars={
+	'OMP_NUM_THREADS':36,
+	'OMP_WAIT_POLICY':"active",
+	'OMP_PROC_BIND':"close",
+	'OMP_PLACES':"cores",
+	'APOLLO_COLLECTIVE_TRAINING':0 ,
+	'APOLLO_LOCAL_TRAINING':1 ,
+	'APOLLO_RETRAIN_ENABLE':0 ,
+	'APOLLO_STORE_MODELS':0,
+	'APOLLO_TRACE_CSV':0,
+	'APOLLO_SINGLE_MODEL':0 ,
+	'APOLLO_REGION_MODEL':1 ,
+	'APOLLO_GLOBAL_TRAIN_PERIOD':10000,
+	'APOLLO_ENABLE_PERF_CNTRS':0 ,
+	'APOLLO_PERF_CNTRS_MLTPX':0 ,
+	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
+	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
+}
+
+envvarsList = [var+'='+str(envvars[var]) for var in envvars]
+envvarsStr = " ".join(envvarsList)
+
 #debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
@@ -236,29 +256,28 @@ def main():
 		# Let's go to the executable directory
 		os.chdir(exedir)
 		oraclepath = exedir+'/'+progsuffix[1:]+'-VA-oracle'
-		try:
-			print('Making:', oraclepath)
-			os.mkdir(oraclepath)
-		except OSError as error:
-			print('oracle dir may already exist, not creating...')
 
 		# Go into the oracle folder since the create-datasets will dump here
+		# and the load-datasets will read from here
 		os.chdir(oraclepath)
 
-		command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
+		#command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
 
 		for probSize in probSizes:
 
 			inputArgs=prog[probSize]
 			suffix = progsuffix+'-'+probSize
 
-			dirname = 'trace-'+suffix[1:]
+			name = suffix[1:]
 
-			command += ' '+exedir+'/'+dirname
+			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset'
+			#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
+			command = command+' '+debugRun+' ../'+exe+inputArgs
 
-		command = 'sbatch -N 1 -n 1 --time="01:00:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
-		print('Going to execute:', command)
-		os.system(command)
+			command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'oracle" --output="'+name+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+			print('Going to execute:', command)
+			return
+			#os.system(command)
 
 	print('Static runs launched!')
 	return
