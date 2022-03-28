@@ -20,7 +20,7 @@ envvars={
 	'APOLLO_LOCAL_TRAINING':1 ,
 	'APOLLO_RETRAIN_ENABLE':0 ,
 	'APOLLO_STORE_MODELS':0,
-	'APOLLO_TRACE_CSV':1,
+	'APOLLO_TRACE_CSV':0,
 	'APOLLO_SINGLE_MODEL':0 ,
 	'APOLLO_REGION_MODEL':1 ,
 	'APOLLO_GLOBAL_TRAIN_PERIOD':10000,
@@ -36,32 +36,19 @@ debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
 
 def main():
-	print('Starting tests...')
+	print('Starting oracle creation for each program...')
 
 	parser = argparse.ArgumentParser(
 	    description='Launch static runs of benchmark programs using Apollo.')
 	parser.add_argument('--usePA', action='store_true',
 	                    help='Should we use PA data instead of VA?')
-	parser.add_argument('--singleModel', action='store_true',
-	                    help='trace filenames')
 	args = parser.parse_args()
-
-	if args.singleModel and not args.usePA:
-		print('Cant use VA with single models... quitting...')
-		return
 
 	if args.usePA:
 		envvars['APOLLO_ENABLE_PERF_CNTRS'] = 1
-		if args.singleModel:
-			envvars['APOLLO_SINGLE_MODEL'] = 1
-			envvars['APOLLO_REGION_MODEL'] = 0
 
 	envvarsList = [var+'='+str(envvars[var]) for var in envvars]
 	envvarsStr = " ".join(envvarsList)
-
-	print('Setting default envvars')
-	#[os.environ.setdefault(var, envvars[var]) for var in envvars]
-	print('Default environemnt vars set')
 
 	# Run each program without performance counters enabled
 	for progname in progs:
@@ -75,6 +62,13 @@ def main():
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
+		oraclepath = exedir+'/'+progsuffix[1:]+'-VA-oracle'
+
+		# Go into the oracle folder since the create-datasets will dump here
+		# and the load-datasets will read from here
+		os.chdir(oraclepath)
+
+		#command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
 
 		for probSize in probSizes:
 
@@ -84,22 +78,15 @@ def main():
 			if args.usePA:
 				suffix = suffix+'-PA'
 
-			# Let's run all the policies on this problem size
-			for policy in policies:
+			name = suffix[1:]
 
-				name = suffix[1:]
-				#os.environ.update({'APOLLO_POLICY_MODEL': policy})
-				command = envvarsStr+' APOLLO_TRACE_CSV_FOLDER_SUFFIX='+suffix+' APOLLO_POLICY_MODEL='+policy
-				#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
-				command = command+' '+debugRun+' ./'+exe+inputArgs
+			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset'
+			#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
+			command = command+' '+debugRun+' ../'+exe+inputArgs
 
-				#command = 'sbatch -N 1 -n 1 --time="00:20:00" --output="'+suffix[1:]+'-runlogs.out" --open-mode=append --partition=pdebug --wrap="'+command+'"'
-				command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'" --output="'+name+'-runlogs.out" --open-mode=append --wrap="'+command+'"'
-
-				print('Going to execute:', command)
-
-				#res=subprocess.run([command])
-				os.system(command)
+			command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'oracle" --output="'+name+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+			print('Going to execute:', command)
+			os.system(command)
 
 	print('Static runs launched!')
 	return
