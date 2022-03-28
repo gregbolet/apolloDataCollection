@@ -1,0 +1,569 @@
+Starting analysis...
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/backprop/trace-backprop-smallprob
+4 4 4 
+trace-backprop-smallprob: policy 0 | Raw Accuracy: 25.0000 % (time-weighted: 19.4873 %)
+Static xtime: 0.0117 secs (optimal: 0.0109 secs)
+trace-backprop-smallprob: policy 1 | Raw Accuracy: 25.0000 % (time-weighted: 80.3582 %)
+Static xtime: 0.0113 secs (optimal: 0.0109 secs)
+trace-backprop-smallprob: policy 2 | Raw Accuracy: 50.0000 % (time-weighted: 0.1544 %)
+Static xtime: 0.0207 secs (optimal: 0.0109 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/backprop/trace-backprop-medprob
+4 4 4 
+trace-backprop-medprob: policy 0 | Raw Accuracy: 50.0000 % (time-weighted: 94.5431 %)
+Static xtime: 39.4567 secs (optimal: 38.0542 secs)
+trace-backprop-medprob: policy 1 | Raw Accuracy: 50.0000 % (time-weighted: 5.4569 %)
+Static xtime: 62.5993 secs (optimal: 38.0542 secs)
+trace-backprop-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 386.0433 secs (optimal: 38.0542 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/backprop/trace-backprop-largeprob
+4 4 4 
+trace-backprop-largeprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 70.2120 secs (optimal: 70.2120 secs)
+trace-backprop-largeprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 120.4624 secs (optimal: 70.2120 secs)
+trace-backprop-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 630.6905 secs (optimal: 70.2120 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/cfd/trace-cfd-smallprob
+16001 16001 16001 
+trace-cfd-smallprob: policy 0 | Raw Accuracy: 49.9906 % (time-weighted: 87.0773 %)
+Static xtime: 8.5978 secs (optimal: 8.0176 secs)
+trace-cfd-smallprob: policy 1 | Raw Accuracy: 50.0031 % (time-weighted: 12.7111 %)
+Static xtime: 13.3809 secs (optimal: 8.0176 secs)
+trace-cfd-smallprob: policy 2 | Raw Accuracy: 0.0062 % (time-weighted: 0.2115 %)
+Static xtime: 169.3005 secs (optimal: 8.0176 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/cfd/trace-cfd-medprob
+16001 16001 16001 
+trace-cfd-medprob: policy 0 | Raw Accuracy: 50.0156 % (time-weighted: 89.3261 %)
+Static xtime: 11.3659 secs (optimal: 10.4386 secs)
+trace-cfd-medprob: policy 1 | Raw Accuracy: 49.9844 % (time-weighted: 10.6739 %)
+Static xtime: 17.8795 secs (optimal: 10.4386 secs)
+trace-cfd-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 233.7669 secs (optimal: 10.4386 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/cfd/trace-cfd-largeprob
+16001 16001 16001 
+trace-cfd-largeprob: policy 0 | Raw Accuracy: 50.0031 % (time-weighted: 91.1198 %)
+Static xtime: 21.8161 secs (optimal: 20.0400 secs)
+trace-cfd-largeprob: policy 1 | Raw Accuracy: 49.9969 % (time-weighted: 8.8802 %)
+Static xtime: 36.3695 secs (optimal: 20.0400 secs)
+trace-cfd-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 516.4125 secs (optimal: 20.0400 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/heartwall/trace-heartwall-smallprob
+20 20 20 
+trace-heartwall-smallprob: policy 0 | Raw Accuracy: 95.0000 % (time-weighted: 99.3256 %)
+Static xtime: 0.9624 secs (optimal: 0.9596 secs)
+trace-heartwall-smallprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 1.4233 secs (optimal: 0.9596 secs)
+trace-heartwall-smallprob: policy 2 | Raw Accuracy: 5.0000 % (time-weighted: 0.6744 %)
+Static xtime: 19.6381 secs (optimal: 0.9596 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/heartwall/trace-heartwall-medprob
+52 52 52 
+trace-heartwall-medprob: policy 0 | Raw Accuracy: 98.0769 % (time-weighted: 99.7702 %)
+Static xtime: 2.5549 secs (optimal: 2.5521 secs)
+trace-heartwall-medprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 3.8014 secs (optimal: 2.5521 secs)
+trace-heartwall-medprob: policy 2 | Raw Accuracy: 1.9231 % (time-weighted: 0.2298 %)
+Static xtime: 53.4495 secs (optimal: 2.5521 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/heartwall/trace-heartwall-largeprob
+104 104 104 
+trace-heartwall-largeprob: policy 0 | Raw Accuracy: 99.0385 % (time-weighted: 99.8785 %)
+Static xtime: 5.1468 secs (optimal: 5.1448 secs)
+trace-heartwall-largeprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 7.6604 secs (optimal: 5.1448 secs)
+trace-heartwall-largeprob: policy 2 | Raw Accuracy: 0.9615 % (time-weighted: 0.1215 %)
+Static xtime: 108.2110 secs (optimal: 5.1448 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/hotspot/trace-hotspot-smallprob
+2000 2000 2000 
+trace-hotspot-smallprob: policy 0 | Raw Accuracy: 99.6000 % (time-weighted: 96.3545 %)
+Static xtime: 0.2325 secs (optimal: 0.2301 secs)
+trace-hotspot-smallprob: policy 1 | Raw Accuracy: 0.4000 % (time-weighted: 3.6455 %)
+Static xtime: 0.3272 secs (optimal: 0.2301 secs)
+trace-hotspot-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 3.3269 secs (optimal: 0.2301 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/hotspot/trace-hotspot-medprob
+2000 2000 2000 
+trace-hotspot-medprob: policy 0 | Raw Accuracy: 99.9000 % (time-weighted: 99.0853 %)
+Static xtime: 5.7638 secs (optimal: 5.7200 secs)
+trace-hotspot-medprob: policy 1 | Raw Accuracy: 0.1000 % (time-weighted: 0.9147 %)
+Static xtime: 11.4460 secs (optimal: 5.7200 secs)
+trace-hotspot-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 122.5033 secs (optimal: 5.7200 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/hotspot/trace-hotspot-largeprob
+2000 2000 2000 
+trace-hotspot-largeprob: policy 0 | Raw Accuracy: 99.8500 % (time-weighted: 99.2626 %)
+Static xtime: 97.1978 secs (optimal: 96.9159 secs)
+trace-hotspot-largeprob: policy 1 | Raw Accuracy: 0.1500 % (time-weighted: 0.7374 %)
+Static xtime: 184.3724 secs (optimal: 96.9159 secs)
+trace-hotspot-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 1957.0898 secs (optimal: 96.9159 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/leukocyte/trace-leukocyte-smallprob
+101 101 101 
+trace-leukocyte-smallprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 12.0549 secs (optimal: 12.0549 secs)
+trace-leukocyte-smallprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 22.6835 secs (optimal: 12.0549 secs)
+trace-leukocyte-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 264.6024 secs (optimal: 12.0549 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/leukocyte/trace-leukocyte-medprob
+401 401 401 
+trace-leukocyte-medprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 47.1250 secs (optimal: 47.1250 secs)
+trace-leukocyte-medprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 88.0931 secs (optimal: 47.1250 secs)
+trace-leukocyte-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 1074.9575 secs (optimal: 47.1250 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/leukocyte/trace-leukocyte-largeprob
+601 601 601 
+trace-leukocyte-largeprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 69.9622 secs (optimal: 69.9622 secs)
+trace-leukocyte-largeprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 130.1605 secs (optimal: 69.9622 secs)
+trace-leukocyte-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 1605.3322 secs (optimal: 69.9622 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/lud/trace-lud-smallprob
+510 510 510 
+trace-lud-smallprob: policy 0 | Raw Accuracy: 73.3333 % (time-weighted: 92.8922 %)
+Static xtime: 0.2269 secs (optimal: 0.2234 secs)
+trace-lud-smallprob: policy 1 | Raw Accuracy: 25.6863 % (time-weighted: 7.0897 %)
+Static xtime: 0.3840 secs (optimal: 0.2234 secs)
+trace-lud-smallprob: policy 2 | Raw Accuracy: 0.9804 % (time-weighted: 0.0180 %)
+Static xtime: 4.6033 secs (optimal: 0.2234 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/lud/trace-lud-medprob
+2046 2046 2046 
+trace-lud-medprob: policy 0 | Raw Accuracy: 84.8974 % (time-weighted: 96.9662 %)
+Static xtime: 17.1653 secs (optimal: 16.9745 secs)
+trace-lud-medprob: policy 1 | Raw Accuracy: 14.8583 % (time-weighted: 3.0336 %)
+Static xtime: 21.4961 secs (optimal: 16.9745 secs)
+trace-lud-medprob: policy 2 | Raw Accuracy: 0.2444 % (time-weighted: 0.0003 %)
+Static xtime: 292.2148 secs (optimal: 16.9745 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/lud/trace-lud-largeprob
+4094 4094 4094 
+trace-lud-largeprob: policy 0 | Raw Accuracy: 92.1837 % (time-weighted: 98.9341 %)
+Static xtime: 127.9246 secs (optimal: 127.5719 secs)
+trace-lud-largeprob: policy 1 | Raw Accuracy: 7.6942 % (time-weighted: 1.0659 %)
+Static xtime: 163.1781 secs (optimal: 127.5719 secs)
+trace-lud-largeprob: policy 2 | Raw Accuracy: 0.1221 % (time-weighted: 0.0000 %)
+Static xtime: 2369.4293 secs (optimal: 127.5719 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nn/trace-nn-smallprob
+4280 4280 4280 
+trace-nn-smallprob: policy 0 | Raw Accuracy: 0.6542 % (time-weighted: 0.8361 %)
+Static xtime: 0.0401 secs (optimal: 0.0208 secs)
+trace-nn-smallprob: policy 1 | Raw Accuracy: 27.2196 % (time-weighted: 20.1879 %)
+Static xtime: 0.0263 secs (optimal: 0.0208 secs)
+trace-nn-smallprob: policy 2 | Raw Accuracy: 72.1262 % (time-weighted: 78.9760 %)
+Static xtime: 0.0221 secs (optimal: 0.0208 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nn/trace-nn-medprob
+16400 16400 16400 
+trace-nn-medprob: policy 0 | Raw Accuracy: 0.3415 % (time-weighted: 0.5526 %)
+Static xtime: 0.1262 secs (optimal: 0.0638 secs)
+trace-nn-medprob: policy 1 | Raw Accuracy: 17.1890 % (time-weighted: 16.2970 %)
+Static xtime: 0.0806 secs (optimal: 0.0638 secs)
+trace-nn-medprob: policy 2 | Raw Accuracy: 82.4695 % (time-weighted: 83.1504 %)
+Static xtime: 0.0680 secs (optimal: 0.0638 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nn/trace-nn-largeprob
+262400 262400 262400 
+trace-nn-largeprob: policy 0 | Raw Accuracy: 0.4059 % (time-weighted: 0.7464 %)
+Static xtime: 1.7943 secs (optimal: 0.9403 secs)
+trace-nn-largeprob: policy 1 | Raw Accuracy: 24.5560 % (time-weighted: 25.1729 %)
+Static xtime: 1.2041 secs (optimal: 0.9403 secs)
+trace-nn-largeprob: policy 2 | Raw Accuracy: 75.0381 % (time-weighted: 74.0807 %)
+Static xtime: 1.0180 secs (optimal: 0.9403 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nw/trace-nw-smallprob
+2873 2873 2873 
+trace-nw-smallprob: policy 0 | Raw Accuracy: 70.1009 % (time-weighted: 49.3602 %)
+Static xtime: 0.7287 secs (optimal: 0.6599 secs)
+trace-nw-smallprob: policy 1 | Raw Accuracy: 29.8294 % (time-weighted: 49.7131 %)
+Static xtime: 0.7903 secs (optimal: 0.6599 secs)
+trace-nw-smallprob: policy 2 | Raw Accuracy: 0.0696 % (time-weighted: 0.9267 %)
+Static xtime: 8.3055 secs (optimal: 0.6599 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nw/trace-nw-medprob
+4123 4123 4123 
+trace-nw-medprob: policy 0 | Raw Accuracy: 57.9190 % (time-weighted: 76.4959 %)
+Static xtime: 1.9077 secs (optimal: 1.4458 secs)
+trace-nw-medprob: policy 1 | Raw Accuracy: 41.9840 % (time-weighted: 23.0943 %)
+Static xtime: 1.8061 secs (optimal: 1.4458 secs)
+trace-nw-medprob: policy 2 | Raw Accuracy: 0.0970 % (time-weighted: 0.4098 %)
+Static xtime: 17.9433 secs (optimal: 1.4458 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/nw/trace-nw-largeprob
+5749 5749 5749 
+trace-nw-largeprob: policy 0 | Raw Accuracy: 36.6325 % (time-weighted: 60.7589 %)
+Static xtime: 7.0097 secs (optimal: 3.3267 secs)
+trace-nw-largeprob: policy 1 | Raw Accuracy: 62.6718 % (time-weighted: 38.8758 %)
+Static xtime: 3.8123 secs (optimal: 3.3267 secs)
+trace-nw-largeprob: policy 2 | Raw Accuracy: 0.6958 % (time-weighted: 0.3653 %)
+Static xtime: 34.5504 secs (optimal: 3.3267 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/pathfinder/trace-pathfinder-smallprob
+24999 24999 24999 
+trace-pathfinder-smallprob: policy 0 | Raw Accuracy: 60.6184 % (time-weighted: 55.1190 %)
+Static xtime: 0.9176 secs (optimal: 0.8711 secs)
+trace-pathfinder-smallprob: policy 1 | Raw Accuracy: 39.3816 % (time-weighted: 44.8810 %)
+Static xtime: 0.9315 secs (optimal: 0.8711 secs)
+trace-pathfinder-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 9.7344 secs (optimal: 0.8711 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/pathfinder/trace-pathfinder-medprob
+4999 4999 4999 
+trace-pathfinder-medprob: policy 0 | Raw Accuracy: 43.5687 % (time-weighted: 44.9169 %)
+Static xtime: 0.2514 secs (optimal: 0.2201 secs)
+trace-pathfinder-medprob: policy 1 | Raw Accuracy: 56.4113 % (time-weighted: 50.6601 %)
+Static xtime: 0.2334 secs (optimal: 0.2201 secs)
+trace-pathfinder-medprob: policy 2 | Raw Accuracy: 0.0200 % (time-weighted: 4.4230 %)
+Static xtime: 0.4819 secs (optimal: 0.2201 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/pathfinder/trace-pathfinder-largeprob
+9999 9999 9999 
+trace-pathfinder-largeprob: policy 0 | Raw Accuracy: 35.3135 % (time-weighted: 37.4708 %)
+Static xtime: 0.2954 secs (optimal: 0.2471 secs)
+trace-pathfinder-largeprob: policy 1 | Raw Accuracy: 64.6765 % (time-weighted: 58.7178 %)
+Static xtime: 0.2782 secs (optimal: 0.2471 secs)
+trace-pathfinder-largeprob: policy 2 | Raw Accuracy: 0.0100 % (time-weighted: 3.8114 %)
+Static xtime: 1.6129 secs (optimal: 0.2471 secs)
+
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/srad/srad_v1/trace-sradv1-smallprob
+20 20 20 
+trace-sradv1-smallprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 0.3033 secs (optimal: 0.3033 secs)
+trace-sradv1-smallprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 0.5227 secs (optimal: 0.3033 secs)
+trace-sradv1-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 6.6672 secs (optimal: 0.3033 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/srad/srad_v1/trace-sradv1-medprob
+200 200 200 
+trace-sradv1-medprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 2.5818 secs (optimal: 2.5818 secs)
+trace-sradv1-medprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 4.7349 secs (optimal: 2.5818 secs)
+trace-sradv1-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 61.5669 secs (optimal: 2.5818 secs)
+/usr/WS2/bolet1/benchmarks/rodinia/rodinia_3.1/openmp/srad/srad_v1/trace-sradv1-largeprob
+2000 2000 2000 
+trace-sradv1-largeprob: policy 0 | Raw Accuracy: 99.9500 % (time-weighted: 99.9558 %)
+Static xtime: 25.0353 secs (optimal: 25.0276 secs)
+trace-sradv1-largeprob: policy 1 | Raw Accuracy: 0.0500 % (time-weighted: 0.0442 %)
+Static xtime: 46.6186 secs (optimal: 25.0276 secs)
+trace-sradv1-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 612.1295 secs (optimal: 25.0276 secs)
+
+/usr/WS2/bolet1/faros/FAROS/bin/CoMD/omp/trace-comd-smallprob
+823 823 823 
+trace-comd-smallprob: policy 0 | Raw Accuracy: 97.6914 % (time-weighted: 99.5760 %)
+Static xtime: 10.1475 secs (optimal: 10.0371 secs)
+trace-comd-smallprob: policy 1 | Raw Accuracy: 2.3086 % (time-weighted: 0.4240 %)
+Static xtime: 19.9455 secs (optimal: 10.0371 secs)
+trace-comd-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 254.5659 secs (optimal: 10.0371 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/CoMD/omp/trace-comd-medprob
+823 823 823 
+trace-comd-medprob: policy 0 | Raw Accuracy: 95.3827 % (time-weighted: 99.2297 %)
+Static xtime: 81.2765 secs (optimal: 80.0871 secs)
+trace-comd-medprob: policy 1 | Raw Accuracy: 4.6173 % (time-weighted: 0.7703 %)
+Static xtime: 148.4646 secs (optimal: 80.0871 secs)
+trace-comd-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 2054.5263 secs (optimal: 80.0871 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/CoMD/omp/trace-comd-largeprob
+823 823 
+trace-comd-largeprob: policy 0 | Raw Accuracy: 95.8688 % (time-weighted: 99.3444 %)
+Static xtime: 616.5241 secs (optimal: 609.2024 secs)
+trace-comd-largeprob: policy 1 | Raw Accuracy: 4.1312 % (time-weighted: 0.6556 %)
+Static xtime: 1189.4806 secs (optimal: 609.2024 secs)
+
+/usr/WS2/bolet1/faros/FAROS/bin/miniFE/omp/trace-minife-smallprob
+1216 1216 1216 
+trace-minife-smallprob: policy 0 | Raw Accuracy: 99.1776 % (time-weighted: 97.5912 %)
+Static xtime: 1.7830 secs (optimal: 1.7581 secs)
+trace-minife-smallprob: policy 1 | Raw Accuracy: 0.7401 % (time-weighted: 2.4056 %)
+Static xtime: 3.4924 secs (optimal: 1.7581 secs)
+trace-minife-smallprob: policy 2 | Raw Accuracy: 0.0822 % (time-weighted: 0.0032 %)
+Static xtime: 25.3158 secs (optimal: 1.7581 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/miniFE/omp/trace-minife-medprob
+1216 1216 1216 
+trace-minife-medprob: policy 0 | Raw Accuracy: 98.1908 % (time-weighted: 93.5193 %)
+Static xtime: 22.8944 secs (optimal: 20.7839 secs)
+trace-minife-medprob: policy 1 | Raw Accuracy: 1.7270 % (time-weighted: 6.4804 %)
+Static xtime: 31.9609 secs (optimal: 20.7839 secs)
+trace-minife-medprob: policy 2 | Raw Accuracy: 0.0822 % (time-weighted: 0.0002 %)
+Static xtime: 231.5108 secs (optimal: 20.7839 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/miniFE/omp/trace-minife-largeprob
+1216 1216 1216 
+trace-minife-largeprob: policy 0 | Raw Accuracy: 97.7796 % (time-weighted: 90.8563 %)
+Static xtime: 95.1949 secs (optimal: 77.8301 secs)
+trace-minife-largeprob: policy 1 | Raw Accuracy: 2.1382 % (time-weighted: 9.1436 %)
+Static xtime: 130.3223 secs (optimal: 77.8301 secs)
+trace-minife-largeprob: policy 2 | Raw Accuracy: 0.0822 % (time-weighted: 0.0001 %)
+Static xtime: 969.5032 secs (optimal: 77.8301 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-bt-smallprob
+1011 1011 1011 
+trace-bt-smallprob: policy 0 | Raw Accuracy: 99.9011 % (time-weighted: 99.8793 %)
+Static xtime: 14.6230 secs (optimal: 14.6226 secs)
+trace-bt-smallprob: policy 1 | Raw Accuracy: 0.0989 % (time-weighted: 0.1207 %)
+Static xtime: 29.0105 secs (optimal: 14.6226 secs)
+trace-bt-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 360.3215 secs (optimal: 14.6226 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-bt-medprob
+1011 1011 1011 
+trace-bt-medprob: policy 0 | Raw Accuracy: 99.8022 % (time-weighted: 99.9766 %)
+Static xtime: 65.1230 secs (optimal: 65.1118 secs)
+trace-bt-medprob: policy 1 | Raw Accuracy: 0.1978 % (time-weighted: 0.0234 %)
+Static xtime: 115.2544 secs (optimal: 65.1118 secs)
+trace-bt-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 1508.0436 secs (optimal: 65.1118 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-bt-largeprob
+1261 1261 
+trace-bt-largeprob: policy 0 | Raw Accuracy: 99.8414 % (time-weighted: 99.9894 %)
+Static xtime: 1328.4276 secs (optimal: 1328.4069 secs)
+trace-bt-largeprob: policy 1 | Raw Accuracy: 0.0793 % (time-weighted: 0.0095 %)
+Static xtime: 2570.6963 secs (optimal: 1328.4069 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-cg-smallprob
+230 230 230 
+trace-cg-smallprob: policy 0 | Raw Accuracy: 50.0000 % (time-weighted: 99.9767 %)
+Static xtime: 5.2114 secs (optimal: 5.2112 secs)
+trace-cg-smallprob: policy 1 | Raw Accuracy: 50.0000 % (time-weighted: 0.0233 %)
+Static xtime: 9.6471 secs (optimal: 5.2112 secs)
+trace-cg-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 116.4696 secs (optimal: 5.2112 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-cg-medprob
+230 230 230 
+trace-cg-medprob: policy 0 | Raw Accuracy: 77.3913 % (time-weighted: 99.9959 %)
+Static xtime: 12.8832 secs (optimal: 12.8831 secs)
+trace-cg-medprob: policy 1 | Raw Accuracy: 22.6087 % (time-weighted: 0.0041 %)
+Static xtime: 24.6933 secs (optimal: 12.8831 secs)
+trace-cg-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 325.2027 secs (optimal: 12.8831 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-cg-largeprob
+305 305 305 
+trace-cg-largeprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 353.8409 secs (optimal: 353.8409 secs)
+trace-cg-largeprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 707.3394 secs (optimal: 353.8409 secs)
+trace-cg-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 10163.7940 secs (optimal: 353.8409 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ep-smallprob
+1 1 1 
+trace-ep-smallprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 2.8917 secs (optimal: 2.8917 secs)
+trace-ep-smallprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 5.7612 secs (optimal: 2.8917 secs)
+trace-ep-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 103.3010 secs (optimal: 2.8917 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ep-medprob
+1 1 1 
+trace-ep-medprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 11.5631 secs (optimal: 11.5631 secs)
+trace-ep-medprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 23.0216 secs (optimal: 11.5631 secs)
+trace-ep-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 413.7610 secs (optimal: 11.5631 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ep-largeprob
+1 1 1 
+trace-ep-largeprob: policy 0 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 184.9180 secs (optimal: 184.9180 secs)
+trace-ep-largeprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 368.2720 secs (optimal: 184.9180 secs)
+trace-ep-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 6624.3800 secs (optimal: 184.9180 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ft-smallprob
+111 111 111 
+trace-ft-smallprob: policy 0 | Raw Accuracy: 80.1802 % (time-weighted: 94.6104 %)
+Static xtime: 2.4994 secs (optimal: 2.3781 secs)
+trace-ft-smallprob: policy 1 | Raw Accuracy: 18.0180 % (time-weighted: 5.3854 %)
+Static xtime: 4.1638 secs (optimal: 2.3781 secs)
+trace-ft-smallprob: policy 2 | Raw Accuracy: 1.8018 % (time-weighted: 0.0042 %)
+Static xtime: 50.1928 secs (optimal: 2.3781 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ft-medprob
+111 111 111 
+trace-ft-medprob: policy 0 | Raw Accuracy: 75.6757 % (time-weighted: 86.6142 %)
+Static xtime: 12.3591 secs (optimal: 11.0226 secs)
+trace-ft-medprob: policy 1 | Raw Accuracy: 22.5225 % (time-weighted: 13.3845 %)
+Static xtime: 18.8281 secs (optimal: 11.0226 secs)
+trace-ft-medprob: policy 2 | Raw Accuracy: 1.8018 % (time-weighted: 0.0013 %)
+Static xtime: 234.6067 secs (optimal: 11.0226 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-ft-largeprob
+136 136 136 
+trace-ft-largeprob: policy 0 | Raw Accuracy: 72.0588 % (time-weighted: 76.0442 %)
+Static xtime: 375.8315 secs (optimal: 354.7464 secs)
+trace-ft-largeprob: policy 1 | Raw Accuracy: 27.9412 % (time-weighted: 23.9558 %)
+Static xtime: 508.7139 secs (optimal: 354.7464 secs)
+trace-ft-largeprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 6822.7497 secs (optimal: 354.7464 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-lu-smallprob
+517 517 517 
+trace-lu-smallprob: policy 0 | Raw Accuracy: 98.6460 % (time-weighted: 99.3729 %)
+Static xtime: 7.0361 secs (optimal: 7.0289 secs)
+trace-lu-smallprob: policy 1 | Raw Accuracy: 1.3540 % (time-weighted: 0.6271 %)
+Static xtime: 12.4185 secs (optimal: 7.0289 secs)
+trace-lu-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 138.1418 secs (optimal: 7.0289 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-lu-medprob
+517 517 517 
+trace-lu-medprob: policy 0 | Raw Accuracy: 99.2263 % (time-weighted: 99.3139 %)
+Static xtime: 29.6473 secs (optimal: 29.5789 secs)
+trace-lu-medprob: policy 1 | Raw Accuracy: 0.7737 % (time-weighted: 0.6861 %)
+Static xtime: 46.9781 secs (optimal: 29.5789 secs)
+trace-lu-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 558.6129 secs (optimal: 29.5789 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-lu-largeprob
+617 617 
+trace-lu-largeprob: policy 0 | Raw Accuracy: 99.3517 % (time-weighted: 99.9902 %)
+Static xtime: 1084.0388 secs (optimal: 1084.0042 secs)
+trace-lu-largeprob: policy 1 | Raw Accuracy: 0.6483 % (time-weighted: 0.0098 %)
+Static xtime: 2114.6630 secs (optimal: 1084.0042 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-sp-smallprob
+3615 3615 3615 
+trace-sp-smallprob: policy 0 | Raw Accuracy: 99.7787 % (time-weighted: 99.1987 %)
+Static xtime: 9.2497 secs (optimal: 9.2128 secs)
+trace-sp-smallprob: policy 1 | Raw Accuracy: 0.2213 % (time-weighted: 0.8013 %)
+Static xtime: 18.4535 secs (optimal: 9.2128 secs)
+trace-sp-smallprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 145.0191 secs (optimal: 9.2128 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-sp-medprob
+3615 3615 3615 
+trace-sp-medprob: policy 0 | Raw Accuracy: 99.1701 % (time-weighted: 98.2496 %)
+Static xtime: 65.5650 secs (optimal: 65.4816 secs)
+trace-sp-medprob: policy 1 | Raw Accuracy: 0.8299 % (time-weighted: 1.7504 %)
+Static xtime: 113.9432 secs (optimal: 65.4816 secs)
+trace-sp-medprob: policy 2 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 574.4173 secs (optimal: 65.4816 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-sp-largeprob
+4515 4515 
+trace-sp-largeprob: policy 0 | Raw Accuracy: 99.8893 % (time-weighted: 99.9676 %)
+Static xtime: 1482.9721 secs (optimal: 1482.7430 secs)
+trace-sp-largeprob: policy 1 | Raw Accuracy: 0.0886 % (time-weighted: 0.0314 %)
+Static xtime: 2797.0690 secs (optimal: 1482.7430 secs)
+
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-mg-smallprob
+1280 1280 1280 
+trace-mg-smallprob: policy 0 | Raw Accuracy: 33.6719 % (time-weighted: 97.0518 %)
+Static xtime: 0.5844 secs (optimal: 0.5745 secs)
+trace-mg-smallprob: policy 1 | Raw Accuracy: 30.7031 % (time-weighted: 2.6271 %)
+Static xtime: 1.0643 secs (optimal: 0.5745 secs)
+trace-mg-smallprob: policy 2 | Raw Accuracy: 35.6250 % (time-weighted: 0.3211 %)
+Static xtime: 7.5522 secs (optimal: 0.5745 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-mg-medprob
+1448 1448 1448 
+trace-mg-medprob: policy 0 | Raw Accuracy: 41.6436 % (time-weighted: 96.4868 %)
+Static xtime: 5.1220 secs (optimal: 4.9346 secs)
+trace-mg-medprob: policy 1 | Raw Accuracy: 25.4834 % (time-weighted: 3.2856 %)
+Static xtime: 9.5785 secs (optimal: 4.9346 secs)
+trace-mg-medprob: policy 2 | Raw Accuracy: 32.8729 % (time-weighted: 0.2275 %)
+Static xtime: 62.3188 secs (optimal: 4.9346 secs)
+/usr/WS2/bolet1/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/trace-mg-largeprob
+3896 3896 3896 
+trace-mg-largeprob: policy 0 | Raw Accuracy: 45.5852 % (time-weighted: 97.2408 %)
+Static xtime: 92.6110 secs (optimal: 91.2116 secs)
+trace-mg-largeprob: policy 1 | Raw Accuracy: 25.5647 % (time-weighted: 2.7541 %)
+Static xtime: 179.6099 secs (optimal: 91.2116 secs)
+trace-mg-largeprob: policy 2 | Raw Accuracy: 28.8501 % (time-weighted: 0.0052 %)
+Static xtime: 1265.7278 secs (optimal: 91.2116 secs)
+
+/usr/WS2/bolet1/faros/FAROS/bin/AMG/omp/trace-amg-smallprob
+1570 1570 1570 
+trace-amg-smallprob: policy 0 | Raw Accuracy: 37.7070 % (time-weighted: 95.7751 %)
+Static xtime: 0.9061 secs (optimal: 0.8681 secs)
+trace-amg-smallprob: policy 1 | Raw Accuracy: 24.2675 % (time-weighted: 3.3307 %)
+Static xtime: 2.1345 secs (optimal: 0.8681 secs)
+trace-amg-smallprob: policy 2 | Raw Accuracy: 38.0255 % (time-weighted: 0.8942 %)
+Static xtime: 14.2171 secs (optimal: 0.8681 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/AMG/omp/trace-amg-medprob
+1974 1974 1974 
+trace-amg-medprob: policy 0 | Raw Accuracy: 48.1763 % (time-weighted: 98.2036 %)
+Static xtime: 8.1936 secs (optimal: 8.1062 secs)
+trace-amg-medprob: policy 1 | Raw Accuracy: 14.9949 % (time-weighted: 1.7206 %)
+Static xtime: 15.9377 secs (optimal: 8.1062 secs)
+trace-amg-medprob: policy 2 | Raw Accuracy: 36.8288 % (time-weighted: 0.0758 %)
+Static xtime: 134.6596 secs (optimal: 8.1062 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/AMG/omp/trace-amg-largeprob
+2074 2074 2074 
+trace-amg-largeprob: policy 0 | Raw Accuracy: 54.6287 % (time-weighted: 94.6031 %)
+Static xtime: 38.0057 secs (optimal: 35.4229 secs)
+trace-amg-largeprob: policy 1 | Raw Accuracy: 17.0685 % (time-weighted: 5.3911 %)
+Static xtime: 68.9855 secs (optimal: 35.4229 secs)
+trace-amg-largeprob: policy 2 | Raw Accuracy: 28.3028 % (time-weighted: 0.0058 %)
+Static xtime: 591.6658 secs (optimal: 35.4229 secs)
+
+/usr/WS2/bolet1/faros/FAROS/bin/Quicksilver/omp/trace-qs-smallprob
+1150 1150 1150 
+trace-qs-smallprob: policy 0 | Raw Accuracy: 0.8696 % (time-weighted: 0.0008 %)
+Static xtime: 75.4553 secs (optimal: 28.7414 secs)
+trace-qs-smallprob: policy 1 | Raw Accuracy: 96.0000 % (time-weighted: 99.9984 %)
+Static xtime: 28.7415 secs (optimal: 28.7414 secs)
+trace-qs-smallprob: policy 2 | Raw Accuracy: 3.1304 % (time-weighted: 0.0008 %)
+Static xtime: 121.7928 secs (optimal: 28.7414 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/Quicksilver/omp/trace-qs-medprob
+2303 2303 2303 
+trace-qs-medprob: policy 0 | Raw Accuracy: 1.3895 % (time-weighted: 0.0010 %)
+Static xtime: 149.6131 secs (optimal: 58.0452 secs)
+trace-qs-medprob: policy 1 | Raw Accuracy: 95.3539 % (time-weighted: 99.9982 %)
+Static xtime: 58.0453 secs (optimal: 58.0452 secs)
+trace-qs-medprob: policy 2 | Raw Accuracy: 3.2566 % (time-weighted: 0.0008 %)
+Static xtime: 244.7282 secs (optimal: 58.0452 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/Quicksilver/omp/trace-qs-largeprob
+4587 4587 4587 
+trace-qs-largeprob: policy 0 | Raw Accuracy: 1.2862 % (time-weighted: 0.0009 %)
+Static xtime: 305.9921 secs (optimal: 119.3130 secs)
+trace-qs-largeprob: policy 1 | Raw Accuracy: 95.8797 % (time-weighted: 99.9984 %)
+Static xtime: 119.3133 secs (optimal: 119.3130 secs)
+trace-qs-largeprob: policy 2 | Raw Accuracy: 2.8341 % (time-weighted: 0.0006 %)
+Static xtime: 484.3329 secs (optimal: 119.3130 secs)
+
+/usr/WS2/bolet1/faros/FAROS/bin/XSBench/omp/trace-xsbench-smallprob
+13 13 13 
+trace-xsbench-smallprob: policy 0 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 0.0181 secs (optimal: 0.0109 secs)
+trace-xsbench-smallprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 0.0127 secs (optimal: 0.0109 secs)
+trace-xsbench-smallprob: policy 2 | Raw Accuracy: 100.0000 % (time-weighted: 100.0000 %)
+Static xtime: 0.0109 secs (optimal: 0.0109 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/XSBench/omp/trace-xsbench-medprob
+13 13 13 
+trace-xsbench-medprob: policy 0 | Raw Accuracy: 38.4615 % (time-weighted: 2.4384 %)
+Static xtime: 0.0420 secs (optimal: 0.0263 secs)
+trace-xsbench-medprob: policy 1 | Raw Accuracy: 0.0000 % (time-weighted: 0.0000 %)
+Static xtime: 0.0334 secs (optimal: 0.0263 secs)
+trace-xsbench-medprob: policy 2 | Raw Accuracy: 61.5385 % (time-weighted: 97.5616 %)
+Static xtime: 0.0298 secs (optimal: 0.0263 secs)
+/usr/WS2/bolet1/faros/FAROS/bin/XSBench/omp/trace-xsbench-largeprob
+13 13 13 
+trace-xsbench-largeprob: policy 0 | Raw Accuracy: 23.0769 % (time-weighted: 1.5785 %)
+Static xtime: 0.1504 secs (optimal: 0.1034 secs)
+trace-xsbench-largeprob: policy 1 | Raw Accuracy: 61.5385 % (time-weighted: 92.4927 %)
+Static xtime: 0.1141 secs (optimal: 0.1034 secs)
+trace-xsbench-largeprob: policy 2 | Raw Accuracy: 15.3846 % (time-weighted: 5.9288 %)
+Static xtime: 0.1935 secs (optimal: 0.1034 secs)
+
+/usr/WS2/bolet1/lulesh-region-fix-correct/LULESH/build/trace-lulesh-smallprob
+10600568 10600568 10600568 
+trace-lulesh-smallprob: policy 0 | Raw Accuracy: 0.1382 % (time-weighted: 3.4053 %)
+Static xtime: 125.9951 secs (optimal: 38.1491 secs)
+trace-lulesh-smallprob: policy 1 | Raw Accuracy: 7.4025 % (time-weighted: 16.0725 %)
+Static xtime: 80.8779 secs (optimal: 38.1491 secs)
+trace-lulesh-smallprob: policy 2 | Raw Accuracy: 92.4592 % (time-weighted: 80.5222 %)
+Static xtime: 65.6047 secs (optimal: 38.1491 secs)
+/usr/WS2/bolet1/lulesh-region-fix-correct/LULESH/build/trace-lulesh-medprob
+11375000 11375000 11375000 
+trace-lulesh-medprob: policy 0 | Raw Accuracy: 0.3324 % (time-weighted: 10.8021 %)
+Static xtime: 146.6417 secs (optimal: 70.0030 secs)
+trace-lulesh-medprob: policy 1 | Raw Accuracy: 41.1045 % (time-weighted: 50.6519 %)
+Static xtime: 103.9783 secs (optimal: 70.0030 secs)
+trace-lulesh-medprob: policy 2 | Raw Accuracy: 58.5631 % (time-weighted: 38.5459 %)
+Static xtime: 238.1122 secs (optimal: 70.0030 secs)
+/usr/WS2/bolet1/lulesh-region-fix-correct/LULESH/build/trace-lulesh-largeprob
+11375000 11375000 11375000 
+trace-lulesh-largeprob: policy 0 | Raw Accuracy: 1.5361 % (time-weighted: 25.2967 %)
+Static xtime: 177.6322 secs (optimal: 128.3516 secs)
+trace-lulesh-largeprob: policy 1 | Raw Accuracy: 85.2450 % (time-weighted: 56.7878 %)
+Static xtime: 147.0633 secs (optimal: 128.3516 secs)
+trace-lulesh-largeprob: policy 2 | Raw Accuracy: 13.2189 % (time-weighted: 17.9154 %)
+Static xtime: 671.8058 secs (optimal: 128.3516 secs)
+Analysis Complete!
