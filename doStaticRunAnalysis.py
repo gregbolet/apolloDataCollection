@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import glob
 from benchmarks import progs
+import argparse
 
 # This program will examine the rundata for the static0, static1, static2
 # policies of each target program. Then it will parse the TRACE_CSV files to quantify
@@ -18,6 +19,13 @@ probSizes=['smallprob', 'medprob', 'largeprob']
 
 def main():
 	print('Starting analysis...')
+
+	parser = argparse.ArgumentParser(
+	    description='Launch static runs of benchmark programs using Apollo.')
+	parser.add_argument('--usePA', action='store_true',
+	                    help='Should we use PA data instead of VA?')
+	args = parser.parse_args()
+
 	# For each program
 	for progname in progs:
 			prog = progs[progname]
@@ -32,6 +40,9 @@ def main():
 			for probSize in probSizes:
 
 				foldername = 'trace'+progsuffix+'-'+probSize
+
+				if args.usePA:
+					foldername += '-PA'
 
 				# Go into the problem-size folder
 				os.chdir(exedir+'/'+foldername)
