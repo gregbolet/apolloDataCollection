@@ -7,5 +7,7 @@ These executables should already have been built using the Apollo-aware LLVM com
 Here's an example workflow with the scripts using PA:
 
 `python3 doStaticRuns.py --usePA --singleModel`
+
 `python3 createOracleDatasets.py --usePA`
+
 `python3 doRunsUsingOracle.py --usePA`
