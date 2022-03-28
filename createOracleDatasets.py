@@ -181,15 +181,6 @@ progs={
 #							'largeprob':'-s -t 36'},
 
 
-
-			 'rodinia_':{'exedir':'',
-							   'exe':' ',
-								 'exeprefix':'',
-							   'suffix':'-',
-							   'smallprob':'',
-							   'medprob':  '',
-							   'largeprob':''},
-
 	'amg':{'exedir':'/g/g15/bolet1/workspace/faros/FAROS/bin/AMG/omp',
 							'exe':'amg ',
 							'exeprefix':'mpirun -n 1',
@@ -225,28 +216,6 @@ progs={
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
 
-envvars={
-	'OMP_NUM_THREADS':36,
-	'OMP_WAIT_POLICY':"active",
-	'OMP_PROC_BIND':"close",
-	'OMP_PLACES':"cores",
-	'APOLLO_COLLECTIVE_TRAINING':0 ,
-	'APOLLO_LOCAL_TRAINING':1 ,
-	'APOLLO_RETRAIN_ENABLE':0 ,
-	'APOLLO_STORE_MODELS':0,
-	'APOLLO_TRACE_CSV':1,
-	'APOLLO_SINGLE_MODEL':1 ,
-	'APOLLO_REGION_MODEL':0 ,
-	'APOLLO_GLOBAL_TRAIN_PERIOD':10000,
-	'APOLLO_ENABLE_PERF_CNTRS':0 ,
-	'APOLLO_PERF_CNTRS_MLTPX':0 ,
-	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
-	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
-}
-
-envvarsList = [var+'='+str(envvars[var]) for var in envvars]
-envvarsStr = " ".join(envvarsList)
-
 #debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
@@ -266,24 +235,30 @@ def main():
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
+		oraclepath = exedir+'/'+progsuffix[1:]+'-VA-oracle'
+		print('Making:', oraclepath)
+		try:
+			os.mkdir(oraclepath)
+		except OSError as error:
+			print('oracle dir may already exist, not creating...')
+
+		# Go into the oracle folder since the create-datasets will dump here
+		os.chdir(oraclepath)
+
+		command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
 
 		for probSize in probSizes:
 
 			inputArgs=prog[probSize]
 			suffix = progsuffix+'-'+probSize
 
-			# Let's run all the policies on this problem size
-			for policy in policies:
+			dirname = 'trace-'+suffix[1:]
 
-				name = suffix[1:]
-				command = envvarsStr+' APOLLO_TRACE_CSV_FOLDER_SUFFIX='+suffix+' APOLLO_POLICY_MODEL='+policy
-				command = command+' '+debugRun+' ./'+exe+inputArgs
+			command += ' '+exedir+'/'+dirname
 
-				command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'" --output="'+name+'-runlogs.out" --open-mode=append --wrap="'+command+'"'
-
-				#print('Going to execute:', command)
-
-				os.system(command)
+		command = 'sbatch -N 1 -n 1 --time="01:00:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+		print('Going to execute:', command)
+		os.system(command)
 
 	print('Static runs launched!')
 	return
