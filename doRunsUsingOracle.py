@@ -62,7 +62,12 @@ def main():
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
-		oraclepath = exedir+'/'+progsuffix[1:]+'-VA-oracle'
+		oraclepath = exedir+'/'+progsuffix[1:]
+
+		if args.usePA:
+			oraclepath += '-PA-oracle'
+		else:
+			oraclepath += '-VA-oracle'
 
 		# Go into the oracle folder since the create-datasets will dump here
 		# and the load-datasets will read from here
