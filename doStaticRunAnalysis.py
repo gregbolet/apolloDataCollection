@@ -105,6 +105,9 @@ def main():
 					#print(polMatches)
 
 					numRegionExecutions = len(polMatches.index)
+					if numRegionExecutions == 0:
+						print('Zero region execution data, skipping!')
+						continue
 
 					# Get the matches and calculate the accuracies
 					matches = polMatches.loc[polMatches['policy'] == True]

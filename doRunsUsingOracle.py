@@ -20,7 +20,7 @@ envvars={
 	'APOLLO_LOCAL_TRAINING':1 ,
 	'APOLLO_RETRAIN_ENABLE':0 ,
 	'APOLLO_STORE_MODELS':0,
-	'APOLLO_TRACE_CSV':0,
+	'APOLLO_TRACE_CSV':1,
 	'APOLLO_SINGLE_MODEL':0 ,
 	'APOLLO_REGION_MODEL':1 ,
 	'APOLLO_GLOBAL_TRAIN_PERIOD':10000,
@@ -59,6 +59,7 @@ def main():
 		exedir = prog['exedir']
 		exe = prog['exe']
 		exeprefix = prog['exeprefix']
+		maxruntime = prog['maxruntime']
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
@@ -89,7 +90,7 @@ def main():
 			#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
 			command = command+' '+debugRun+' ../'+exe+inputArgs
 
-			command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'oracle" --output="'+name+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+			command = 'sbatch -N 1 -n 1 --time="'+maxruntime+'" --job-name="'+name+'oracle" --output="'+name+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
 			print('Going to execute:', command)
 			os.system(command)
 
