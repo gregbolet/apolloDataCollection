@@ -68,7 +68,7 @@ def main():
 
 			command += ' '+exedir+'/'+dirname
 
-		command = 'sbatch -N 1 -n 1 --time="01:00:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+		command = 'sbatch -N 1 -n 1 --time="00:30:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
 		print('Going to execute:', command)
 		os.system(command)
 

@@ -52,6 +52,8 @@ def main():
 
 	if args.usePA:
 		envvars['APOLLO_ENABLE_PERF_CNTRS'] = 1
+		# This flag is useless, we make the oracle from the region trace csvs
+		# these flags are only useful if we have Apollo print out he model
 		if args.singleModel:
 			envvars['APOLLO_SINGLE_MODEL'] = 1
 			envvars['APOLLO_REGION_MODEL'] = 0
@@ -72,6 +74,7 @@ def main():
 		exedir = prog['exedir']
 		exe = prog['exe']
 		exeprefix = prog['exeprefix']
+		maxruntime = prog['maxruntime']
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
@@ -94,7 +97,7 @@ def main():
 				command = command+' '+debugRun+' ./'+exe+inputArgs
 
 				#command = 'sbatch -N 1 -n 1 --time="00:20:00" --output="'+suffix[1:]+'-runlogs.out" --open-mode=append --partition=pdebug --wrap="'+command+'"'
-				command = 'sbatch -N 1 -n 1 --time="03:00:00" --job-name="'+name+'" --output="'+name+'-runlogs.out" --open-mode=append --wrap="'+command+'"'
+				command = 'sbatch -N 1 -n 1 --time="'+maxruntime+'" --job-name="'+name+'" --output="'+name+'-runlogs.out" --open-mode=append --wrap="'+command+'"'
 
 				print('Going to execute:', command)
 
