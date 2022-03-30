@@ -54,7 +54,8 @@ def main():
 		# Go into the oracle folder since the create-datasets will dump here
 		os.chdir(oraclepath)
 
-		command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
+		#command = debugRun+' python3 '+create_dataset_script+' --agg mean-min --tracedirs'
+		command = 'python3 '+create_dataset_script+' --agg mean-min --tracedirs'
 
 		for probSize in probSizes:
 
@@ -68,7 +69,7 @@ def main():
 
 			command += ' '+exedir+'/'+dirname
 
-		command = 'sbatch -N 1 -n 1 --time="00:30:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
+		#command = 'sbatch -N 1 -n 1 --time="00:15:00" --job-name="'+progsuffix[1:]+'oracle" --output="'+progsuffix[1:]+'-oracle-runlogs.out" --open-mode=append --wrap="'+command+'"'
 		print('Going to execute:', command)
 		os.system(command)
 

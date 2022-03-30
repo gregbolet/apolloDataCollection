@@ -86,7 +86,7 @@ def main():
 
 			name = suffix[1:]
 
-			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset'
+			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset'+' APOLLO_TRACE_CSV_FOLDER_SUFFIX='+suffix
 			#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
 			command = command+' '+debugRun+' ../'+exe+inputArgs
 
