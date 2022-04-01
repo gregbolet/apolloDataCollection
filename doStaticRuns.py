@@ -75,6 +75,7 @@ def main():
 		exe = prog['exe']
 		exeprefix = prog['exeprefix']
 		maxruntime = prog['maxruntime']
+		datapath = prog['datapath']
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
@@ -83,6 +84,10 @@ def main():
 
 			inputArgs=prog[probSize]
 			suffix = progsuffix+'-'+probSize
+
+			# String replacement for full paths to input files
+			if len(datapath) > 0:
+				inputArgs = inputArgs%(exedir+'/'+datapath)
 
 			if args.usePA:
 				suffix = suffix+'-PA'

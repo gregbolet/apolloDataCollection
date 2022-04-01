@@ -9,8 +9,6 @@ from benchmarks import progs
 # policies. This will allow us to then parse the TRACE_CSV files to quantify
 # whether there is potential for speedup by adjusting thread counts
 
-policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-
 envvars={
 	'OMP_NUM_THREADS':36,
 	'OMP_WAIT_POLICY':"active",
@@ -60,6 +58,7 @@ def main():
 		exe = prog['exe']
 		exeprefix = prog['exeprefix']
 		maxruntime = prog['maxruntime']
+		datapath = prog['datapath']
 
 		# Let's go to the executable directory
 		os.chdir(exedir)
@@ -79,6 +78,11 @@ def main():
 		for probSize in probSizes:
 
 			inputArgs=prog[probSize]
+
+			# String replacement for full paths to input files
+			if len(datapath) > 0:
+				inputArgs = inputArgs%(exedir+'/'+datapath)
+
 			suffix = progsuffix+'-'+probSize
 
 			if args.usePA:
@@ -86,7 +90,7 @@ def main():
 
 			name = suffix[1:]
 
-			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset'+' APOLLO_TRACE_CSV_FOLDER_SUFFIX='+suffix
+			command = envvarsStr+' APOLLO_POLICY_MODEL=DecisionTree,load-dataset,max_depth=4'+' APOLLO_TRACE_CSV_FOLDER_SUFFIX='+suffix
 			#command = command+' '+debugRun+' '+exeprefix+' ./'+exe+inputArgs
 			command = command+' '+debugRun+' ../'+exe+inputArgs
 
