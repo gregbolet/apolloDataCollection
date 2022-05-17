@@ -73,7 +73,7 @@ def main():
 		print('Going to execute:', command)
 		os.system(command)
 
-	print('Static runs launched!')
+	print('Oracle Dataset Creation Jobs Launched!')
 	return
 
 
