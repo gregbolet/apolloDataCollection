@@ -164,7 +164,7 @@ def main():
 		todo, df = get_work_from_checkpoint()
 
 		# Only do the first few experiments for testing purposes
-		todo = todo[:25]
+		#todo = todo[:25]
 
 		# while we still have work to do
 		while len(todo) != 0 :
@@ -212,7 +212,7 @@ def main():
 
 	# If we are not the ROOT node
 	else:
-		mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'.txt', 'w')
+		mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'.txt', 'a')
 
 		while True:
 			# Get some new work
