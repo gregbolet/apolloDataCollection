@@ -6,14 +6,15 @@ from benchmarks import progs
 import sys
 import time
 import pandas as pd
+import re
 
 my_start_time = time.time()
 
 # Assuming 3 hours max time for each MPI node for now
-LIFETIME_IN_SECS = 3 * 60 * 60
+LIFETIME_IN_SECS = 5 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
-NUM_TRIALS = 10
+NUM_TRIALS = 1
 
 OUTPUT_XTIME_FILE='static-ETE-XTimeData.csv'
 
@@ -45,9 +46,11 @@ envvars={
 }
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+policies=['Static,policy=0']
 debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
+probSizes=['smallprob']
 prognames = list(progs.keys())
 
 parser = argparse.ArgumentParser(
@@ -100,6 +103,27 @@ def get_work_from_checkpoint():
 
 	return (todo, df)
 
+# open and go through a file to get the last occurence of line
+# with a particular substring. We then search this line for 
+# a floating point xtime value and return that
+def get_file_last_line_timing_match(filename, line_substring):
+
+	lines = []
+	with open(filename, 'r') as toread:
+		for line in toread:
+			if line_substring in line:
+				lines.append(line)
+
+	if len(lines) > 0:
+		# now get the last line
+		last_line = lines[len(lines)-1]
+		floats = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", last_line)
+
+		if len(floats) > 0:
+			return float(floats[len(floats)-1])
+
+	return None
+
 def convert_time_to_secs(slurm_time):
 	hrs, mins, secs = slurm_time.split(':')
 
@@ -112,6 +136,7 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	exeprefix = prog['exeprefix']
 	maxruntime = prog['maxruntime']
 	datapath = prog['datapath']
+	xtimeline = prog['xtimelinesearch']
 
 	# Let's go to the executable directory
 	os.chdir(exedir)
@@ -138,6 +163,12 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	ete_xtime = time.time()
 	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout)
 	ete_xtime = time.time() - ete_xtime
+
+	# now let's see if we can get the xtime from the stdout
+	if xtimeline != '':
+		file_xtime = get_file_last_line_timing_match(mystdout.name, xtimeline)
+		if file_xtime != None:
+			return file_xtime
 
 	return ete_xtime
 
@@ -232,6 +263,8 @@ def main():
 			# DO WORK HERE
 			# DO WORK HERE
 			# DO WORK HERE
+			# write to the output file so we know what run this was
+			#mystdout.write('PERFORMING TEST FOR: '+str(mywork)+'\n')	
 			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mystdout)
 			print('[%d] work completed in %f seconds!'%(my_rank, ete_xtime))
 			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime, mywork[3]), dest=ROOT_RANK, tag=DONE_WORK_TAG)
