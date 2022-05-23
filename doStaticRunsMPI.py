@@ -16,7 +16,6 @@ LIFETIME_IN_SECS = 6 * 60 * 60
 # These are the number of trials we want to run for each configuration
 NUM_TRIALS = 10
 
-OUTPUT_XTIME_FILE='static-ETE-XTimeData.csv'
 
 ROOT_RANK = 0
 REQUEST_WORK_TAG = 11
@@ -46,6 +45,7 @@ envvars={
 }
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
 debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
@@ -66,13 +66,17 @@ if args.singleModel and not args.usePA:
 	print('Cant use VA with single models... quitting...')
 	sys.exit("Can't use VA with single models")
 
+OUTPUT_XTIME_FILE='static-ETE-XTimeData_VA.csv'
+
 if args.usePA:
-	envvars['APOLLO_ENABLE_PERF_CNTRS'] = 1
+	envvars['APOLLO_ENABLE_PERF_CNTRS'] = '1'
+	OUTPUT_XTIME_FILE='static-ETE-XTimeData_PA.csv'
 	# This flag is useless, we make the oracle from the region trace csvs
 	# these flags are only useful if we have Apollo print out he model
 	if args.singleModel:
-		envvars['APOLLO_SINGLE_MODEL'] = 1
-		envvars['APOLLO_REGION_MODEL'] = 0
+		envvars['APOLLO_SINGLE_MODEL'] = '1'
+		envvars['APOLLO_REGION_MODEL'] = '0'
+
 
 #envvarsList = [var+'='+str(envvars[var]) for var in envvars]
 #envvarsStr = " ".join(envvarsList)
@@ -249,7 +253,12 @@ def main():
 
 	# If we are not the ROOT node
 	else:
-		mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'.txt', 'a')
+
+		if args.usePA:		
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
+		else:
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
+
 
 		while True:
 			# Get some new work
