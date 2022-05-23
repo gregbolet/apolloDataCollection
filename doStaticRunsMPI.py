@@ -11,10 +11,10 @@ import re
 my_start_time = time.time()
 
 # Assuming 3 hours max time for each MPI node for now
-LIFETIME_IN_SECS = 5 * 60 * 60
+LIFETIME_IN_SECS = 6 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
-NUM_TRIALS = 1
+NUM_TRIALS = 10
 
 OUTPUT_XTIME_FILE='static-ETE-XTimeData.csv'
 
@@ -46,11 +46,11 @@ envvars={
 }
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-policies=['Static,policy=0']
+#policies=['Static,policy=0']
 debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
-probSizes=['smallprob']
+#probSizes=['smallprob']
 prognames = list(progs.keys())
 
 parser = argparse.ArgumentParser(
@@ -119,8 +119,10 @@ def get_file_last_line_timing_match(filename, line_substring):
 		last_line = lines[len(lines)-1]
 		floats = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", last_line)
 
+		# if we have a nonzero count of floats
+		# grab the first one and use that as the timing value
 		if len(floats) > 0:
-			return float(floats[len(floats)-1])
+			return float(floats[0])
 
 	return None
 
@@ -146,7 +148,11 @@ def doRunForProg(prog, probSize, policy, mystdout):
 
 	# String replacement for full paths to input files
 	if len(datapath) > 0:
-		inputArgs = inputArgs%(exedir+'/'+datapath)
+		# count the number of replacements to make
+		numtorep = inputArgs.count('%s')
+		strtorep = exedir+'/'+datapath
+		replTuple = tuple([strtorep]*numtorep)
+		inputArgs = inputArgs%replTuple
 
 	if args.usePA:
 		suffix = suffix+'-PA'
@@ -161,7 +167,7 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	print('Going to execute:', command)
 	# Get the end-to-end xtime
 	ete_xtime = time.time()
-	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout)
+	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout, stderr=mystdout)
 	ete_xtime = time.time() - ete_xtime
 
 	# now let's see if we can get the xtime from the stdout
