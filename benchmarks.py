@@ -233,7 +233,7 @@ progs={
 
 	'amg':{'exedir':'/g/g15/bolet1/workspace/faros/FAROS/bin/AMG/omp',
 							'exe':'amg ',
-							'exeprefix':'',
+							'exeprefix':'srun -n1 -N1 ',
 							'suffix':'-amg',
 							'datapath':'',
 							'xtimelinesearch':'wall clock time',
