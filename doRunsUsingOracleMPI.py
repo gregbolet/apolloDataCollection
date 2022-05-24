@@ -11,7 +11,7 @@ from pathlib import Path
 
 my_start_time = time.time()
 
-# Assuming 3 hours max time for each MPI node for now
+# Assuming 5 hours max time for each MPI node for now
 LIFETIME_IN_SECS = 5 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
@@ -38,21 +38,23 @@ envvars={
 	'APOLLO_TRACE_CSV':'1',
 	'APOLLO_SINGLE_MODEL':'0' ,
 	'APOLLO_REGION_MODEL':'1' ,
-	'APOLLO_GLOBAL_TRAIN_PERIOD':'10000',
+	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
 	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
 	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
 	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
 	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
 }
 
-policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-policies=['Static,policy=2']
+#policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+#policies=['Static,policy=2']
 #policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
-debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
-#debugRun='srun -n1 -N1 --export=ALL '
+#policies=['DecisionTree,load-dataset,max_depth=4', 'DecisionTree,load-dataset,max_depth=2']
+policies=['DecisionTree,load-dataset,max_depth=4']
+
 probSizes=['smallprob', 'medprob', 'largeprob']
 #probSizes=['smallprob']
+
 prognames = list(progs.keys())
 
 parser = argparse.ArgumentParser(
@@ -68,11 +70,11 @@ if args.singleModel and not args.usePA:
 	print('Cant use VA with single models... quitting...')
 	sys.exit("Can't use VA with single models")
 
-OUTPUT_XTIME_FILE='static-ETE-XTimeData_VA.csv'
+OUTPUT_XTIME_FILE='oracle-ETE-XTimeData_VA.csv'
 
 if args.usePA:
 	envvars['APOLLO_ENABLE_PERF_CNTRS'] = '1'
-	OUTPUT_XTIME_FILE='static-ETE-XTimeData_PA.csv'
+	OUTPUT_XTIME_FILE='oracle-ETE-XTimeData_PA.csv'
 	# This flag is useless, we make the oracle from the region trace csvs
 	# these flags are only useful if we have Apollo print out he model
 	if args.singleModel:
@@ -153,6 +155,20 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	# Let's go to the executable directory
 	os.chdir(exedir)
 
+	# Instead of staying in the exe dir, we need to go to the dir with the
+	# yaml data files that load-dataset will be loading in from
+	oraclepath = exedir+'/'+progsuffix[1:]
+
+	if args.usePA:
+		oraclepath += '-PA-oracle'
+	else:
+		oraclepath += '-VA-oracle'
+
+	os.chdir(oraclepath)
+
+	# Now that we're one dir in, we need to be sure to adjust the other dirs
+	# 
+
 	inputArgs=prog[probSize]
 	suffix = progsuffix+'-'+probSize
 
@@ -172,7 +188,7 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	envvars['APOLLO_POLICY_MODEL']=policy
 	vars_to_use = {**os.environ.copy(), **envvars}
 
-	command = './'+str(exe)+str(inputArgs)
+	command = '../'+str(exe)+str(inputArgs)
 
 	print('Going to execute:', command)
 	# Get the end-to-end xtime
@@ -261,9 +277,9 @@ def main():
 	else:
 
 		if args.usePA:		
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_oracle_rank'+str(my_rank)+'_PA.txt', 'a')
 		else:
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_oracle_rank'+str(my_rank)+'_VA.txt', 'a')
 
 
 		while True:

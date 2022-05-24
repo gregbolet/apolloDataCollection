@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=Lyre_VA_MPI_Testing # Job name
-#SBATCH --ntasks=15                  # Number of MPI tasks (i.e. processes)
-#SBATCH --nodes=15                    # Maximum number of nodes to be allocated
-#SBATCH --time=06:00:00              
+#SBATCH --ntasks=13                  # Number of MPI tasks (i.e. processes)
+#SBATCH --nodes=13                    # Maximum number of nodes to be allocated
+#SBATCH --time=05:00:00              
 #SBATCH --output=mpiRunLogs.txt     
 #SBATCH --open-mode=truncate
 #ignore SBATCH --partition=pdebug

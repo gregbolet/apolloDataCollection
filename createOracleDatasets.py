@@ -11,10 +11,11 @@ from benchmarks import progs
 
 create_dataset_script='/g/g15/bolet1/workspace/apollo/src/python/modeling/create-dataset.py'
 
-policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+#policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+policies=['Static,policy=0', 'Static,policy=1']
 
 #debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
-debugRun='srun -n1 -N1 --export=ALL '
+#debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
 
 def main():
@@ -73,7 +74,7 @@ def main():
 		print('Going to execute:', command)
 		os.system(command)
 
-	print('Oracle Dataset Creation Jobs Launched!')
+	print('Oracle Dataset Creation Job Completed!')
 	return
 
 
