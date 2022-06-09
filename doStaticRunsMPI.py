@@ -15,7 +15,7 @@ my_start_time = time.time()
 LIFETIME_IN_SECS = 5 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
-NUM_TRIALS = 10
+NUM_TRIALS = 4
 
 
 ROOT_RANK = 0
@@ -35,7 +35,7 @@ envvars={
 	'APOLLO_LOCAL_TRAINING':'1' ,
 	'APOLLO_RETRAIN_ENABLE':'0' ,
 	'APOLLO_STORE_MODELS':'0',
-	'APOLLO_TRACE_CSV':'1',
+	'APOLLO_TRACE_CSV':'0',
 	'APOLLO_SINGLE_MODEL':'0' ,
 	'APOLLO_REGION_MODEL':'1' ,
 	'APOLLO_GLOBAL_TRAIN_PERIOD':'10000',
@@ -46,7 +46,7 @@ envvars={
 }
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-policies=['Static,policy=2']
+#policies=['Static,policy=2']
 #policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
 debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
@@ -141,7 +141,7 @@ def convert_time_to_secs(slurm_time):
 
 	return (int(hrs) * 60 * 60) + (int(mins) * 60) + (int(secs))
 
-def doRunForProg(prog, probSize, policy, mystdout):
+def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	progsuffix = prog['suffix']
 	exedir = prog['exedir']
 	exe = prog['exe']
@@ -154,7 +154,7 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	os.chdir(exedir)
 
 	inputArgs=prog[probSize]
-	suffix = progsuffix+'-'+probSize
+	suffix = progsuffix+'-'+probSize+'-trial'+str(trialnum)
 
 	# String replacement for full paths to input files
 	if len(datapath) > 0:
@@ -167,7 +167,6 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	if args.usePA:
 		suffix = suffix+'-PA'
 
-	name = suffix[1:]
 	envvars['APOLLO_TRACE_CSV_FOLDER_SUFFIX']=suffix
 	envvars['APOLLO_POLICY_MODEL']=policy
 	vars_to_use = {**os.environ.copy(), **envvars}
@@ -210,11 +209,8 @@ def main():
 		# prepare the work to do
 		todo, df = get_work_from_checkpoint()
 
-		# Only do the first few experiments for testing purposes
-		#todo = todo[:25]
-
 		# while we still have work to do
-		while len(todo) != 0 :
+		while len(todo) != 0:
 			# cycle through each worker and give them some work
 			for worker in workerStates:
 				workerState = workerStates[worker][0]
@@ -286,9 +282,9 @@ def main():
 			# DO WORK HERE
 			# write to the output file so we know what run this was
 			#mystdout.write('PERFORMING TEST FOR: '+str(mywork)+'\n')	
-			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mystdout)
+			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mywork[3], mystdout)
 			print('[%d] work completed in %f seconds!'%(my_rank, ete_xtime))
-			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime, mywork[3]), dest=ROOT_RANK, tag=DONE_WORK_TAG)
+			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime), dest=ROOT_RANK, tag=DONE_WORK_TAG)
 			req.wait()
 
 

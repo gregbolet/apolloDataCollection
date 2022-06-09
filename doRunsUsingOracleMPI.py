@@ -170,7 +170,7 @@ def doRunForProg(prog, probSize, policy, mystdout):
 	# 
 
 	inputArgs=prog[probSize]
-	suffix = progsuffix+'-'+probSize
+	suffix = progsuffix+'-'+probSize+'-trial'+str(trialnum)
 
 	# String replacement for full paths to input files
 	if len(datapath) > 0:
