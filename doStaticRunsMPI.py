@@ -15,7 +15,7 @@ my_start_time = time.time()
 LIFETIME_IN_SECS = 5 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
-NUM_TRIALS = 4
+NUM_TRIALS = 10
 
 
 ROOT_RANK = 0
@@ -45,9 +45,9 @@ envvars={
 	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
 }
 
-policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+#policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
 #policies=['Static,policy=2']
-#policies=['Static,policy=0', 'Static,policy=1']
+policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
 debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
@@ -175,9 +175,10 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 
 	print('Going to execute:', command)
 	# Get the end-to-end xtime
-	ete_xtime = time.time()
+	#ete_xtime = time.time()
+	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW)
 	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout, stderr=mystdout)
-	ete_xtime = time.time() - ete_xtime
+	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW) - ete_xtime
 
 	# now let's see if we can get the xtime from the stdout
 	if xtimeline != '':
