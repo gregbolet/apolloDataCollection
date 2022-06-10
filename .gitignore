@@ -2,6 +2,7 @@
 *
 
 # Leave all the python files
-!*.txt
+#!*.txt
 !*.py
 !.gitignore
+!*.sh

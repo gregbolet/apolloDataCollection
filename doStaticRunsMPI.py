@@ -127,7 +127,7 @@ def get_file_last_line_timing_match(filename, line_substring):
 	if len(lines) > 0:
 		# now get the last line
 		last_line = lines[len(lines)-1]
-		floats = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", last_line)
+		floats = re.findall(r"[-|+]?\d*\.?\d*[e|E]?[+|-]?\d+", last_line)
 
 		# if we have a nonzero count of floats
 		# grab the first one and use that as the timing value
@@ -171,7 +171,7 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	envvars['APOLLO_POLICY_MODEL']=policy
 	vars_to_use = {**os.environ.copy(), **envvars}
 
-	command = './'+str(exe)+str(inputArgs)
+	command = exeprefix+'./'+str(exe)+str(inputArgs)
 
 	print('Going to execute:', command)
 	# Get the end-to-end xtime
@@ -199,6 +199,8 @@ def main():
 	workers = range(num_workers)[1:]
 	print('[%d] Starting!'%(my_rank))
 
+	print('num workers: ', num_workers)
+
 	if my_rank == ROOT_RANK:
 		workerStates = {}
 
@@ -211,6 +213,7 @@ def main():
 
 		# while we still have work to do
 		while len(todo) != 0:
+			#print('TODO is NOT empty! ')
 			# cycle through each worker and give them some work
 			for worker in workerStates:
 				workerState = workerStates[worker][0]
@@ -221,6 +224,7 @@ def main():
 					#print('DONE_WORK_TAG')
 					if len(todo) != 0:
 						work = todo.pop(0)
+						print('Gonna work on: ', work)
 						req = comm.isend(work, dest=worker, tag=NEW_WORK_TAG)
 						workerStates[worker] = (REQUEST_WORK_TAG, req)
 				elif workerState == REQUEST_WORK_TAG:
@@ -261,6 +265,8 @@ def main():
 		else:
 			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
 
+		# redirect my stdout to use this new file
+		sys.stdout = mystdout
 
 		while True:
 			# Get some new work
