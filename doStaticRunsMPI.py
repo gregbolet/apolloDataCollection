@@ -49,7 +49,7 @@ envvars={
 #policies=['Static,policy=2']
 policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
-debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
+#debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
 probSizes=['smallprob', 'medprob', 'largeprob']
 #probSizes=['smallprob']
@@ -59,6 +59,8 @@ parser = argparse.ArgumentParser(
     description='Launch static runs of benchmark programs using Apollo.')
 parser.add_argument('--usePA', action='store_true',
                     help='Should we use PA data instead of VA?')
+parser.add_argument('--makeTraces', action='store_true',
+                    help='Should we store CSV traces?')
 parser.add_argument('--singleModel', action='store_true',
                     help='trace filenames')
 args = parser.parse_args()
@@ -78,6 +80,11 @@ if args.usePA:
 	if args.singleModel:
 		envvars['APOLLO_SINGLE_MODEL'] = '1'
 		envvars['APOLLO_REGION_MODEL'] = '0'
+
+if args.makeTraces:
+	envvars['APOLLO_TRACE_CSV'] = '1'
+else:
+	envvars['APOLLO_TRACE_CSV'] = '0'
 
 
 #envvarsList = [var+'='+str(envvars[var]) for var in envvars]
@@ -149,6 +156,7 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	maxruntime = prog['maxruntime']
 	datapath = prog['datapath']
 	xtimeline = prog['xtimelinesearch']
+	xtimescalefactor = float(prog['xtimescalefactor'])
 
 	# Let's go to the executable directory
 	os.chdir(exedir)
@@ -173,20 +181,22 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 
 	command = exeprefix+'./'+str(exe)+str(inputArgs)
 
-	print('Going to execute:', command)
+	mystdout.write('Going to execute:'+str(command)+'\n')
 	# Get the end-to-end xtime
 	#ete_xtime = time.time()
 	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW)
 	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout, stderr=mystdout)
 	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW) - ete_xtime
 
+	mystdout.flush()
+
 	# now let's see if we can get the xtime from the stdout
 	if xtimeline != '':
 		file_xtime = get_file_last_line_timing_match(mystdout.name, xtimeline)
 		if file_xtime != None:
-			return file_xtime
+			return file_xtime*xtimescalefactor
 
-	return ete_xtime
+	return ete_xtime*xtimescalefactor
 
 def main():
 	print('Starting tests...')
@@ -213,7 +223,22 @@ def main():
 		todo, df = get_work_from_checkpoint()
 
 		# while we still have work to do
-		while len(todo) != 0:
+		while True:
+
+			# check for stopping condition
+			if len(todo) == 0:
+				# check that all the workers have a DONE_WORK_TAG
+				doneworkCount = 0
+				numworkers = 0
+				for worker in workerStates:
+					numworkers += 1
+					if workerStates[worker][0] == DONE_WORK_TAG:
+						doneworkCount += 1
+				
+				# if all the workers are waiting and there is no more work, we quit
+				if doneworkCount == numworkers:
+					break
+
 			#print('TODO is NOT empty! ')
 			# cycle through each worker and give them some work
 			for worker in workerStates:
@@ -267,30 +292,29 @@ def main():
 			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
 
 		# redirect my stdout to use this new file
-		sys.stdout = mystdout
+		#sys.stdout = mystdout
 
 		while True:
 			# Get some new work
 			req = comm.irecv(source=ROOT_RANK, tag=NEW_WORK_TAG)
 			mywork = req.wait()
 			if mywork == None:
-				print('[%d] DONE: ran out of work!'%(my_rank))
+				mystdout.write('[%d] DONE: ran out of work!\n'%(my_rank))
 				break
 
 			max_time = convert_time_to_secs(progs[mywork[0]]['maxruntime'])
 			alive_time = time.time() - my_start_time
 			if (alive_time + max_time) >= LIFETIME_IN_SECS:
-				print('unable to continue, not enough time for %s, alive for %f[/%f] secs'%(mywork, alive_time, LIFETIME_IN_SECS))
-				break
+				mystdout.write('may be unable to continue, not enough time for %s, alive for %f[/%f] secs\n'%(mywork, alive_time, LIFETIME_IN_SECS))
 
-			print('[%d] I got work: %s'%(my_rank, mywork))
+			mystdout.write('[%d] I got work: %s\n'%(my_rank, mywork))
 			# DO WORK HERE
 			# DO WORK HERE
 			# DO WORK HERE
 			# write to the output file so we know what run this was
 			#mystdout.write('PERFORMING TEST FOR: '+str(mywork)+'\n')	
 			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mywork[3], mystdout)
-			print('[%d] work completed in %f seconds!'%(my_rank, ete_xtime))
+			mystdout.write('[%d] work completed in %f seconds!\n'%(my_rank, ete_xtime))
 			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime), dest=ROOT_RANK, tag=DONE_WORK_TAG)
 			req.wait()
 
@@ -299,6 +323,7 @@ def main():
 			#command = 'grep -rni "launched"'
 			# try to launch a command
 			#subprocess.call(shlex.split(command))
+		mystdout.close()
 	return
 
 main()
