@@ -16,6 +16,7 @@ LIFETIME_IN_SECS = 5 * 60 * 60
 
 # These are the number of trials we want to run for each configuration
 NUM_TRIALS = 10
+#NUM_TRIALS = 4
 
 
 ROOT_RANK = 0
@@ -38,16 +39,16 @@ envvars={
 	'APOLLO_TRACE_CSV':'0',
 	'APOLLO_SINGLE_MODEL':'0' ,
 	'APOLLO_REGION_MODEL':'1' ,
-	'APOLLO_GLOBAL_TRAIN_PERIOD':'10000',
+	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
 	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
 	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
 	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
 	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
 }
 
-#policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
+policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
 #policies=['Static,policy=2']
-policies=['Static,policy=0', 'Static,policy=1']
+#policies=['Static,policy=0', 'Static,policy=1']
 #policies=['Static,policy=0']
 #debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
 #debugRun='srun -n1 -N1 --export=ALL '
@@ -62,7 +63,12 @@ parser.add_argument('--usePA', action='store_true',
 parser.add_argument('--makeTraces', action='store_true',
                     help='Should we store CSV traces?')
 parser.add_argument('--singleModel', action='store_true',
-                    help='trace filenames')
+                    help='Should we execute with single models for PA?')
+parser.add_argument('--quickPolicies', action='store_true',
+                    help='Should we just do policies 0 and 1 for quick results.')
+parser.add_argument('--numTrials', help='How many trials to run with', default=10,
+                    type=int)
+
 args = parser.parse_args()
 print('I got args:', args)
 
@@ -86,6 +92,12 @@ if args.makeTraces:
 else:
 	envvars['APOLLO_TRACE_CSV'] = '0'
 
+if args.quickPolicies:
+	policies= policies[0:2]
+	print('policies quick:', policies)
+
+NUM_TRIALS = args.numTrials
+print('Doing %d trials'%(NUM_TRIALS))
 
 #envvarsList = [var+'='+str(envvars[var]) for var in envvars]
 #envvarsStr = " ".join(envvarsList)

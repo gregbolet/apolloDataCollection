@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=Lyre_PA_MPI_Testing # Job name
-#SBATCH --ntasks=20                  # Number of MPI tasks (i.e. processes)
-#SBATCH --nodes=20                    # Maximum number of nodes to be allocated
-#SBATCH --time=05:00:00              
+#SBATCH --ntasks=21                  # Number of MPI tasks (i.e. processes)
+#SBATCH --nodes=21                    # Maximum number of nodes to be allocated
+#SBATCH --time=6:00:00              
 #SBATCH --output=mpiRunLogs_PA.txt     
 #SBATCH --open-mode=truncate
 #ignore SBATCH --partition=pdebug
@@ -13,7 +13,12 @@
 # sbatch -n8 -N8 --time="03:00:00" --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
 
 # srun -n8 -N8 --partition=pdebug --time="00:05:00" --open-mode=truncate --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
-srun python3 doStaticRunsMPI.py --usePA
+
+# this should complete all the policy=0 and policy=1 runs
+srun python3 doStaticRunsMPI.py --usePA --quickPolicies --makeTraces
+
+# this will finish off the policy=2 runs
+srun python3 doStaticRunsMPI.py --usePA --numTrials 4 --makeTraces
 # srun /bin/hostname
 
 # srun -n3 -N3 myprogram &

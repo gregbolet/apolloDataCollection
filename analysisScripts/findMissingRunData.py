@@ -14,10 +14,10 @@ sys.path.append(parent)
 from benchmarks import progs
 
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
-NUM_TRIALS=10
+NUM_TRIALS=4
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-policies=['Static,policy=0', 'Static,policy=1']
+#policies=['Static,policy=0', 'Static,policy=1']
 probSizes=['smallprob', 'medprob', 'largeprob']
 prognames = list(progs.keys())
 

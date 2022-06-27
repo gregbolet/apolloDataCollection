@@ -9,6 +9,7 @@ from pathlib import Path
 pd.set_option('display.max_rows', None)
 
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
+#APOLLO_DATA_COLLECTION_DIR='/g/g15/bolet1/workspace/apolloDataCollection/finalData/quartz/static_runs_no_traces'
 
 # Open the PA and VA csv files
 VAdf = pd.read_csv(APOLLO_DATA_COLLECTION_DIR+'/static-ETE-XTimeData_VA.csv')
@@ -29,6 +30,8 @@ rawdf = pd.concat([VAdf, PAdf])
 rawdf = rawdf.loc[rawdf['progname'] != "rodinia_backprop"]
 rawdf = rawdf.loc[rawdf['progname'] != "rodinia_nn"]
 rawdf = rawdf.loc[rawdf['progname'] != "rodinia_nw"]
+rawdf = rawdf.loc[rawdf['progname'] != "rodinia_pathfinder"]
+#rawdf = rawdf.loc[rawdf['progname'] != "rodinia_lud" & ]
 
 # Let's preprocess and remove runs that don't have the same counts
 grouped = rawdf.groupby(['progname', 'probSize', 'policy', 'type'])

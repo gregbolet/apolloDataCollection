@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=Lyre_VA_MPI_Testing # Job name
-#SBATCH --ntasks=20                  # Number of MPI tasks (i.e. processes)
-#SBATCH --nodes=20                    # Maximum number of nodes to be allocated
-#SBATCH --time=05:00:00              
+#SBATCH --ntasks=21                  # Number of MPI tasks (i.e. processes)
+#SBATCH --nodes=21                    # Maximum number of nodes to be allocated
+#SBATCH --time=6:00:00              
 #SBATCH --output=mpiRunLogs_VA.txt     
 #SBATCH --open-mode=truncate
 #ignore SBATCH --partition=pdebug
@@ -13,4 +13,5 @@
 # sbatch -n8 -N8 --time="03:00:00" --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
 
 # srun -n8 -N8 --partition=pdebug --time="00:05:00" --open-mode=truncate --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
-srun python3 doStaticRunsMPI.py
+srun python3 doStaticRunsMPI.py --quickPolicies --makeTraces
+srun python3 doStaticRunsMPI.py --numTrials 4 --makeTraces
