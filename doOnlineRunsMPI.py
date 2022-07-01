@@ -9,15 +9,9 @@ import pandas as pd
 import re
 from pathlib import Path
 
-my_start_time = time.time()
-
-# Assuming 3 hours max time for each MPI node for now
-LIFETIME_IN_SECS = 5 * 60 * 60
-
-# These are the number of trials we want to run for each configuration
+# These are the default number of trials we want to run for each configuration
 NUM_TRIALS = 10
 #NUM_TRIALS = 4
-
 
 ROOT_RANK = 0
 REQUEST_WORK_TAG = 11
@@ -51,14 +45,9 @@ envvars={
 	'APOLLO_MODELS_DIR':"my-models",
 }
 
-policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-#policies=['Static,policy=2']
-#policies=['Static,policy=0', 'Static,policy=1']
-#policies=['Static,policy=0']
-#debugRun='srun --partition=pdebug -n1 -N1 --export=ALL '
-#debugRun='srun -n1 -N1 --export=ALL '
+minTrainData=[3,6,9,12,15,18,21,24,27,30]
+policies=['DecisionTree,max_depth=4,explore=RoundRobin', 'DecisionTree,max_depth=4,explore=Random']
 probSizes=['smallprob', 'medprob', 'largeprob']
-#probSizes=['smallprob']
 prognames = list(progs.keys())
 
 parser = argparse.ArgumentParser(
@@ -81,11 +70,11 @@ if args.singleModel and not args.usePA:
 	print('Cant use VA with single models... quitting...')
 	sys.exit("Can't use VA with single models")
 
-OUTPUT_XTIME_FILE='static-ETE-XTimeData_VA.csv'
+OUTPUT_XTIME_FILE='online-ETE-XTimeData_VA.csv'
 
 if args.usePA:
 	envvars['APOLLO_ENABLE_PERF_CNTRS'] = '1'
-	OUTPUT_XTIME_FILE='static-ETE-XTimeData_PA.csv'
+	OUTPUT_XTIME_FILE='online-ETE-XTimeData_PA.csv'
 	# This flag is useless, we make the oracle from the region trace csvs
 	# these flags are only useful if we have Apollo print out he model
 	if args.singleModel:
@@ -112,10 +101,10 @@ print('Default environemnt vars set')
 # This function will read the CSV file with data
 # and then generate a list of trials yet to finish
 def get_work_from_checkpoint():
-	todo = [(x,y,z,w) for x in prognames for y in probSizes for z in policies for w in range(NUM_TRIALS)]
+	todo = [(x,y,z,v,w) for x in prognames for y in probSizes for z in policies for v in minTrainData for w in range(NUM_TRIALS)]
 	#todo.sort()
 	print('todo', len(todo))
-	df = pd.DataFrame(columns=['progname', 'probSize', 'policy', 'trialnum', 'eteXtime'])
+	df = pd.DataFrame(columns=['progname', 'probSize', 'policy', 'minTrainData', 'trialnum', 'eteXtime'])
 
 	datafilepath = APOLLO_DATA_COLLECTION_DIR+'/'+OUTPUT_XTIME_FILE
 
@@ -127,7 +116,7 @@ def get_work_from_checkpoint():
 		if tempdf.shape[0] > 0:
 			# Based on what's already done, let's remove these elements from the todo list
 			for row in tempdf.itertuples(index=False, name=None):
-				trial = row[0:4]
+				trial = row[0:5]
 				print('trial we have:', trial)
 				if trial in todo:
 					todo.remove(trial)
@@ -160,12 +149,8 @@ def get_file_last_line_timing_match(filename, line_substring):
 
 	return None
 
-def convert_time_to_secs(slurm_time):
-	hrs, mins, secs = slurm_time.split(':')
 
-	return (int(hrs) * 60 * 60) + (int(mins) * 60) + (int(secs))
-
-def doRunForProg(prog, probSize, policy, trialnum, mystdout):
+def doRunForProg(prog, probSize, policy, minTrainData, trialnum, mystdout):
 	progsuffix = prog['suffix']
 	exedir = prog['exedir']
 	exe = prog['exe']
@@ -175,7 +160,9 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	xtimeline = prog['xtimelinesearch']
 	xtimescalefactor = float(prog['xtimescalefactor'])
 
-	apollo_output_dir = progsuffix[1:]+'-data'
+	envvars['APOLLO_MIN_TRAINING_DATA'] = str(minTrainData)
+
+	apollo_output_dir = progsuffix[1:]+'-online-data'
 	envvars['APOLLO_OUTPUT_DIR'] = apollo_output_dir
 
 	apollo_trial_dir = progsuffix[1:]+'-'+probSize+'-trial'+str(trialnum)
@@ -191,7 +178,8 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	
 	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
 	envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
-	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir 
+	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir
+
 
 	# Let's go to the executable directory
 	os.chdir(exedir)
@@ -211,6 +199,7 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 
 	command = exeprefix+'./'+str(exe)+str(inputArgs)
 
+	mystdout.write('using envvars:\n' + str(envvars) + '\n')
 	mystdout.write('Going to execute:'+str(command)+'\n')
 	# Get the end-to-end xtime
 	#ete_xtime = time.time()
@@ -295,14 +284,15 @@ def main():
 					isDone, responseData = workerReq.test()
 					if isDone:
 						print('worker completed with message: ', responseData)
-						progname = responseData[1][0]
-						probSize = responseData[1][1]
-						policy   = responseData[1][2]
-						trialnum = responseData[1][3]
-						eteXtime = responseData[2]
+						progname 		 = responseData[1][0]
+						probSize 		 = responseData[1][1]
+						policy   		 = responseData[1][2]
+						mintraindata = responseData[1][3]
+						trialnum     = responseData[1][4]
+						eteXtime     = responseData[2]
 						dataToAdd = {'progname': progname, 'probSize': probSize,
-												 'policy': policy, 'trialnum': trialnum,
-												 'eteXtime': eteXtime}
+												 'policy': policy, 'minTrainData':mintraindata,
+												 'trialnum': trialnum, 'eteXtime': eteXtime}
 						toAppend = pd.DataFrame([dataToAdd])
 						df = pd.concat([df, toAppend], ignore_index=True)
 						df.to_csv(OUTPUT_XTIME_FILE, index=False)
@@ -317,9 +307,9 @@ def main():
 	else:
 
 		if args.usePA:		
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/online_mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
 		else:
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/online_mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
 
 		# redirect my stdout to use this new file
 		#sys.stdout = mystdout
@@ -332,18 +322,13 @@ def main():
 				mystdout.write('[%d] DONE: ran out of work!\n'%(my_rank))
 				break
 
-			max_time = convert_time_to_secs(progs[mywork[0]]['maxruntime'])
-			alive_time = time.time() - my_start_time
-			if (alive_time + max_time) >= LIFETIME_IN_SECS:
-				mystdout.write('may be unable to continue, not enough time for %s, alive for %f[/%f] secs\n'%(mywork, alive_time, LIFETIME_IN_SECS))
-
 			mystdout.write('[%d] I got work: %s\n'%(my_rank, mywork))
 			# DO WORK HERE
 			# DO WORK HERE
 			# DO WORK HERE
 			# write to the output file so we know what run this was
 			#mystdout.write('PERFORMING TEST FOR: '+str(mywork)+'\n')	
-			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mywork[3], mystdout)
+			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mywork[3], mywork[4], mystdout)
 			mystdout.write('[%d] work completed in %f seconds!\n'%(my_rank, ete_xtime))
 			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime), dest=ROOT_RANK, tag=DONE_WORK_TAG)
 			req.wait()
