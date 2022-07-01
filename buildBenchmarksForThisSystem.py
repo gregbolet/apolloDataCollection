@@ -1,4 +1,3 @@
-from mpi4py import MPI
 import os
 import subprocess, shlex
 import argparse
@@ -9,21 +8,28 @@ import pandas as pd
 import re
 from pathlib import Path
 
-my_start_time = time.time()
+prognames = list(progs.keys())
 
-# Assuming 3 hours max time for each MPI node for now
-LIFETIME_IN_SECS = 5 * 60 * 60
+# Execute all the clean commands for all the benchmarks
+for progname in prognames:
+	prog = progs[progname]
+	print('Cleaning: ', progname)
+	cleandir = prog['cleandir']
+	cleancmd = prog['cleancmd']
+	builddir = prog['builddir']
+	buildcmd = prog['buildcmd']
 
-# These are the number of trials we want to run for each configuration
-NUM_TRIALS = 10
-#NUM_TRIALS = 4
+	
 
 
-ROOT_RANK = 0
-REQUEST_WORK_TAG = 11
-ACK_WORK_TAG = 12
-DONE_WORK_TAG = 13
-NEW_WORK_TAG = 14
+
+# Let's get the system envvars like compiler and apollo and papi install dirs
+
+
+# Let's start with getting the benchmarks
+
+# Let's go through each benchmark and launch their build command
+
 
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
 
@@ -43,12 +49,7 @@ envvars={
 	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
 	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
 	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
-	'APOLLO_MIN_TRAINING_DATA':"0",
-	'APOLLO_PERSISTENT_DATASETS':"0",
-	'APOLLO_OUTPUT_DIR':"my-test",
-	'APOLLO_DATASETS_DIR':"my-datasets",
-	'APOLLO_TRACES_DIR':"my-traces",
-	'APOLLO_MODELS_DIR':"my-models",
+	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
 }
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
@@ -175,28 +176,11 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	xtimeline = prog['xtimelinesearch']
 	xtimescalefactor = float(prog['xtimescalefactor'])
 
-	apollo_output_dir = progsuffix[1:]+'-data'
-	envvars['APOLLO_OUTPUT_DIR'] = apollo_output_dir
-
-	apollo_trial_dir = progsuffix[1:]+'-'+probSize+'-trial'+str(trialnum)
-
-	if args.usePA:
-		apollo_trial_dir += '-PA'
-	else:
-		apollo_trial_dir += '-VA'
-
-	apollo_trace_dir = apollo_trial_dir + '-traces'
-	apollo_dataset_dir = apollo_trial_dir + '-datasets'
-	apollo_models_dir = apollo_trial_dir + '-models'
-	
-	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
-	envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
-	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir 
-
 	# Let's go to the executable directory
 	os.chdir(exedir)
 
 	inputArgs=prog[probSize]
+	suffix = progsuffix+'-'+probSize+'-trial'+str(trialnum)
 
 	# String replacement for full paths to input files
 	if len(datapath) > 0:
@@ -206,6 +190,10 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 		replTuple = tuple([strtorep]*numtorep)
 		inputArgs = inputArgs%replTuple
 
+	if args.usePA:
+		suffix = suffix+'-PA'
+
+	envvars['APOLLO_TRACE_CSV_FOLDER_SUFFIX']=suffix
 	envvars['APOLLO_POLICY_MODEL']=policy
 	vars_to_use = {**os.environ.copy(), **envvars}
 
