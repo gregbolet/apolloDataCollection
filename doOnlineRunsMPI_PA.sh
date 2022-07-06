@@ -11,4 +11,4 @@
 srun python3 doOnlineRunsMPI.py --usePA --quickPolicies
 
 # this will finish off the policy=2 runs
-srun python3 doOnlineRunsMPI.py --usePA --numTrials 4
+srun python3 doOnlineRunsMPI.py --usePA --numTrials 2
