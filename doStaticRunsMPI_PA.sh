@@ -18,7 +18,7 @@
 srun python3 doStaticRunsMPI.py --usePA --quickPolicies --makeTraces
 
 # this will finish off the policy=2 runs
-srun python3 doStaticRunsMPI.py --usePA --numTrials 4 --makeTraces
+srun python3 doStaticRunsMPI.py --usePA --numTrials 2 --makeTraces
 # srun /bin/hostname
 
 # srun -n3 -N3 myprogram &
