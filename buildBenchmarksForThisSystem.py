@@ -8,20 +8,6 @@ import pandas as pd
 import re
 from pathlib import Path
 
-# This script assumes that you have logged-in to the target machine
-# and have run 'source ~/.profile' to setup the envvars for the
-# proper compiler. Then you can run this script.
-
-hostname = os.uname()[1]
-rootdir = ''
-if 'quartz' in hostname:
-	hostname='quartz'
-elif 'ruby' in hostname:
-	hostname='ruby'
-else:
-	hostname='lassen'
-
-rootdir = rootdirs[hostname]
 
 # logfile
 mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/buildlog_'+str(hostname)+'.txt', 'w')

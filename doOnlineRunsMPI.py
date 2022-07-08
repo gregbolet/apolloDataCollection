@@ -46,7 +46,8 @@ envvars={
 }
 
 minTrainData=[3,6,9,12,15,18,21,24,27,30]
-policies=['DecisionTree,max_depth=4,explore=RoundRobin', 'DecisionTree,max_depth=4,explore=Random']
+#policies=['DecisionTree,max_depth=4,explore=RoundRobin', 'DecisionTree,max_depth=4,explore=Random']
+policies=['DecisionTree,max_depth=4,explore=RoundRobin']
 probSizes=['smallprob', 'medprob', 'largeprob']
 prognames = list(progs.keys())
 

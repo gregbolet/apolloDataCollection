@@ -1,3 +1,4 @@
+import os
 
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
 
@@ -6,6 +7,21 @@ rootdirs={
 	'ruby': '/g/g15/bolet1/workspace/ruby/',
 	'lassen': '/g/g15/bolet1/workspace/lassen/'
 }
+
+# This script assumes that you have logged-in to the target machine
+# and have run 'source ~/.profile' to setup the envvars for the
+# proper compiler. Then you can run this script.
+
+hostname = os.uname()[1]
+rootdir = ''
+if 'quartz' in hostname:
+	hostname='quartz'
+elif 'ruby' in hostname:
+	hostname='ruby'
+else:
+	hostname='lassen'
+
+rootdir = rootdirs[hostname]
 
 # Here we define the programs we will be benchmarking with
 # all the directories are mirrored and assumed to be the same
@@ -155,23 +171,23 @@ progs={
 				 'largeprob':'%s/test.avi 104 36'
 				},
 
-			 'rodinia_leukocyte':{
-				 'exedir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
-			   'exe':'OpenMP/leukocyte ',
-			   'exeprefix':'',
-			   'suffix':'-leukocyte',
-			   'datapath':'../../data/leukocyte',
-			   'builddir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
-			   'buildcmd':'make OpenMP/leukocyte',
-			   'cleandir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
-			   'cleancmd':'make clean',
-			   'xtimelinesearch':'Total application run time:',
-			   'xtimescalefactor': 1,
-			   'maxruntime':'00:35:00',
-			   'smallprob':'99 36 %s/testfile.avi',
-			   'medprob':  '399 36 %s/testfile.avi',
-			   'largeprob':'599 36 %s/testfile.avi'
-				},
+			 #'rodinia_leukocyte':{
+				# 'exedir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
+			 #  'exe':'OpenMP/leukocyte ',
+			 #  'exeprefix':'',
+			 #  'suffix':'-leukocyte',
+			 #  'datapath':'../../data/leukocyte',
+			 #  'builddir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
+			 #  'buildcmd':'make OpenMP/leukocyte',
+			 #  'cleandir':'benchmarks/rodinia/rodinia_3.1/openmp/leukocyte',
+			 #  'cleancmd':'make clean',
+			 #  'xtimelinesearch':'Total application run time:',
+			 #  'xtimescalefactor': 1,
+			 #  'maxruntime':'00:35:00',
+			 #  'smallprob':'99 36 %s/testfile.avi',
+			 #  'medprob':  '399 36 %s/testfile.avi',
+			 #  'largeprob':'599 36 %s/testfile.avi'
+				#},
 
 			 'rodinia_lud':{
 				 'exedir':'benchmarks/rodinia/rodinia_3.1/openmp/lud',
