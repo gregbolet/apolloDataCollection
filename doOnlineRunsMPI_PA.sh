@@ -3,7 +3,7 @@
 #SBATCH --ntasks=11                 # Number of MPI tasks (i.e. processes)
 #SBATCH --nodes=11                    # Maximum number of nodes to be allocated
 #SBATCH --time=6:00:00              
-#SBATCH --output=onlineMRunLogs_PA.txt     
+#SBATCH --output=onlineMpiRunLogs_PA.txt     
 #SBATCH --open-mode=truncate
 #ignore SBATCH --partition=pdebug
 
