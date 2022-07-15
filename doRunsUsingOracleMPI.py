@@ -6,63 +6,9 @@ from new_benchmarks import *
 import sys
 import time
 import pandas as pd
-import re
 from pathlib import Path
 
-# These are the default number of trials we want to run for each configuration
-NUM_TRIALS = 10
-#NUM_TRIALS = 4
-
-ROOT_RANK = 0
-REQUEST_WORK_TAG = 11
-ACK_WORK_TAG = 12
-DONE_WORK_TAG = 13
-NEW_WORK_TAG = 14
-
-APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
-
-envvars={
-	'OMP_WAIT_POLICY':"active",
-	'OMP_PROC_BIND':"close",
-	'OMP_PLACES':"cores",
-	'APOLLO_COLLECTIVE_TRAINING':'0' ,
-	'APOLLO_LOCAL_TRAINING':'1' ,
-	'APOLLO_RETRAIN_ENABLE':'0' ,
-	'APOLLO_STORE_MODELS':'0',
-	'APOLLO_TRACE_CSV':'0',
-	'APOLLO_SINGLE_MODEL':'0' ,
-	'APOLLO_REGION_MODEL':'1' ,
-	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
-	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
-	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
-	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
-	'APOLLO_MIN_TRAINING_DATA':"0",
-	'APOLLO_PERSISTENT_DATASETS':"0",
-	'APOLLO_OUTPUT_DIR':"my-test",
-	'APOLLO_DATASETS_DIR':"my-datasets",
-	'APOLLO_TRACES_DIR':"my-traces",
-	'APOLLO_MODELS_DIR':"my-models",
-}
-
-#depending on the hostname, lets set the thread count
-# lassen is the default
-if hostname == 'quartz':
-	envvars['OMP_NUM_THREADS'] = '36'
-elif hostname == 'ruby':
-	envvars['OMP_NUM_THREADS'] = '56'
-else:
-	envvars['OMP_NUM_THREADS'] = '40'
-
-
-pava = 'VA'
-
-# we can either load the respective oracles that were generated for each benchmark
-# or we can load one yaml data file and apply that data to all the regions
-#policies=['DecisionTree,max_depth=4,load-dataset', 'DecisionTree,max_depth=4,load-dataset=']
-# let's stick with loading the region-based oracle yaml dataset files
-policies=['DecisionTree,max_depth=4,load-dataset']
-probSizes=['smallprob', 'medprob', 'largeprob']
-prognames = list(progs.keys())
+XTIME_FILE_PREFIX='oracle'
 
 parser = argparse.ArgumentParser(
     description='Launch static runs of benchmark programs using Apollo.')
@@ -78,15 +24,25 @@ parser.add_argument('--numTrials', help='How many trials to run with', default=1
 args = parser.parse_args()
 print('I got args:', args)
 
+pava = 'VA'
+
+# we can either load the respective oracles that were generated for each benchmark
+# or we can load one yaml data file and apply that data to all the regions
+#policies=['DecisionTree,max_depth=4,load-dataset', 'DecisionTree,max_depth=4,load-dataset=']
+# let's stick with loading the region-based oracle yaml dataset files
+policies=['DecisionTree,max_depth=4,load-dataset']
+probSizes=['smallprob', 'medprob', 'largeprob']
+prognames = list(progs.keys())
+
 if args.singleModel and not args.usePA:
 	print('Cant use VA with single models... quitting...')
 	sys.exit("Can't use VA with single models")
 
-OUTPUT_XTIME_FILE='oracle-ETE-XTimeData_VA.csv'
+OUTPUT_XTIME_FILE = XTIME_FILE_PREFIX+'-ETE-XTimeData_VA.csv'
 
 if args.usePA:
 	envvars['APOLLO_ENABLE_PERF_CNTRS'] = '1'
-	OUTPUT_XTIME_FILE='oracle-ETE-XTimeData_PA.csv'
+	OUTPUT_XTIME_FILE = XTIME_FILE_PREFIX+'-ETE-XTimeData_PA.csv'
 	# This flag is useless, we make the oracle from the region trace csvs
 	# these flags are only useful if we have Apollo print out he model
 	if args.singleModel:
@@ -137,29 +93,6 @@ def get_work_from_checkpoint():
 
 	return (todo, df)
 
-# open and go through a file to get the last occurence of line
-# with a particular substring. We then search this line for 
-# a floating point xtime value and return that
-def get_file_last_line_timing_match(filename, line_substring):
-
-	lines = []
-	with open(filename, 'r') as toread:
-		for line in toread:
-			if line_substring in line:
-				lines.append(line)
-
-	if len(lines) > 0:
-		# now get the last line
-		last_line = lines[len(lines)-1]
-		floats = re.findall(r"[-|+]?\d*\.?\d*[e|E]?[+|-]?\d+", last_line)
-
-		# if we have a nonzero count of floats
-		# grab the first one and use that as the timing value
-		if len(floats) > 0:
-			return float(floats[0])
-
-	return None
-
 # for this we need to make sure we're in the benchmark's directory
 # and properly pointing to the datasets dir
 def doRunForProg(prog, probSize, policy, trialnum, mystdout):
@@ -172,7 +105,6 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	xtimeline = prog['xtimelinesearch']
 	xtimescalefactor = float(prog['xtimescalefactor'])
 
-
 	apollo_data_dir = exedir+'/'+progsuffix+'-data'
 	envvars['APOLLO_OUTPUT_DIR'] = apollo_data_dir 
 
@@ -180,12 +112,14 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	oracle_output_dir = progsuffix+'-allprobs-oracle-'+pava
 	envvars['APOLLO_DATASETS_DIR'] = oracle_output_dir 
 
-	apollo_trial_dir = progsuffix+'-'+probSize+'-oracle-trial'+str(trialnum)+'-'+pava
+	apollo_trial_dir = progsuffix+'-'+probSize+'-'+XTIME_FILE_PREFIX+'-trial'+str(trialnum)+'-'+pava
 
 	apollo_trace_dir = apollo_trial_dir + '-traces'
+	apollo_dataset_dir = apollo_trial_dir + '-datasets'
 	apollo_models_dir = apollo_trial_dir + '-models'
 	
 	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
+	envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
 	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir
 
 	# Let's go to the executable directory
@@ -291,14 +225,14 @@ def main():
 					isDone, responseData = workerReq.test()
 					if isDone:
 						print('worker completed with message: ', responseData)
-						progname 		 = responseData[1][0]
-						probSize 		 = responseData[1][1]
-						policy   		 = responseData[1][2]
-						trialnum     = responseData[1][3]
-						eteXtime     = responseData[2]
+						progname = responseData[1][0]
+						probSize = responseData[1][1]
+						policy   = responseData[1][2]
+						trialnum = responseData[1][3]
+						eteXtime = responseData[2]
 						dataToAdd = {'progname': progname, 'probSize': probSize,
-												 'policy': policy,
-												 'trialnum': trialnum, 'eteXtime': eteXtime}
+												 'policy': policy, 'trialnum': trialnum, 
+												 'eteXtime': eteXtime}
 						toAppend = pd.DataFrame([dataToAdd])
 						df = pd.concat([df, toAppend], ignore_index=True)
 						df.to_csv(OUTPUT_XTIME_FILE, index=False)
@@ -312,10 +246,14 @@ def main():
 	# If we are not the ROOT node
 	else:
 
+		stdoutFilename = APOLLO_DATA_COLLECTION_DIR+'/'+XTIME_FILE_PREFIX+'_stdout'+'/'+XTIME_FILE_PREFIX+'_stdout_rank'+str(my_rank)
+
 		if args.usePA:		
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/oracle_mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
+			stdoutFilename += '_PA.txt'
 		else:
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/oracle_mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
+			stdoutFilename += '_VA.txt'
+		
+		mystdout = open(stdoutFilename, 'a')
 
 		# redirect my stdout to use this new file
 		#sys.stdout = mystdout

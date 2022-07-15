@@ -2,54 +2,13 @@ from mpi4py import MPI
 import os
 import subprocess, shlex
 import argparse
-from benchmarks import progs
+from new_benchmarks import *
 import sys
 import time
 import pandas as pd
-import re
 from pathlib import Path
 
-# These are the default number of trials we want to run for each configuration
-NUM_TRIALS = 10
-#NUM_TRIALS = 4
-
-ROOT_RANK = 0
-REQUEST_WORK_TAG = 11
-ACK_WORK_TAG = 12
-DONE_WORK_TAG = 13
-NEW_WORK_TAG = 14
-
-APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
-
-envvars={
-	'OMP_NUM_THREADS':'36',
-	'OMP_WAIT_POLICY':"active",
-	'OMP_PROC_BIND':"close",
-	'OMP_PLACES':"cores",
-	'APOLLO_COLLECTIVE_TRAINING':'0' ,
-	'APOLLO_LOCAL_TRAINING':'1' ,
-	'APOLLO_RETRAIN_ENABLE':'0' ,
-	'APOLLO_STORE_MODELS':'0',
-	'APOLLO_TRACE_CSV':'0',
-	'APOLLO_SINGLE_MODEL':'0' ,
-	'APOLLO_REGION_MODEL':'1' ,
-	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
-	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
-	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
-	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
-	'APOLLO_MIN_TRAINING_DATA':"0",
-	'APOLLO_PERSISTENT_DATASETS':"0",
-	'APOLLO_OUTPUT_DIR':"my-test",
-	'APOLLO_DATASETS_DIR':"my-datasets",
-	'APOLLO_TRACES_DIR':"my-traces",
-	'APOLLO_MODELS_DIR':"my-models",
-}
-
-minTrainData=[3,6,9,12,15,18,21,24,27,30]
-#policies=['DecisionTree,max_depth=4,explore=RoundRobin', 'DecisionTree,max_depth=4,explore=Random']
-policies=['DecisionTree,max_depth=4,explore=RoundRobin']
-probSizes=['smallprob', 'medprob', 'largeprob']
-prognames = list(progs.keys())
+XTIME_FILE_PREFIX='online'
 
 parser = argparse.ArgumentParser(
     description='Launch static runs of benchmark programs using Apollo.')
@@ -67,15 +26,22 @@ parser.add_argument('--numTrials', help='How many trials to run with', default=1
 args = parser.parse_args()
 print('I got args:', args)
 
+pava = 'VA'
+
+minTrainData=[3,6,9,12,15,18,21,24,27,30]
+#policies=['DecisionTree,max_depth=4,explore=RoundRobin', 'DecisionTree,max_depth=4,explore=Random']
+policies=['DecisionTree,max_depth=4,explore=RoundRobin']
+probSizes=['smallprob', 'medprob', 'largeprob']
+prognames = list(progs.keys())
 if args.singleModel and not args.usePA:
 	print('Cant use VA with single models... quitting...')
 	sys.exit("Can't use VA with single models")
 
-OUTPUT_XTIME_FILE='online-ETE-XTimeData_VA.csv'
+OUTPUT_XTIME_FILE = XTIME_FILE_PREFIX+'-ETE-XTimeData_VA.csv'
 
 if args.usePA:
 	envvars['APOLLO_ENABLE_PERF_CNTRS'] = '1'
-	OUTPUT_XTIME_FILE='online-ETE-XTimeData_PA.csv'
+	OUTPUT_XTIME_FILE = XTIME_FILE_PREFIX+'-ETE-XTimeData_PA.csv'
 	# This flag is useless, we make the oracle from the region trace csvs
 	# these flags are only useful if we have Apollo print out he model
 	if args.singleModel:
@@ -87,12 +53,16 @@ if args.makeTraces:
 else:
 	envvars['APOLLO_TRACE_CSV'] = '0'
 
+NUM_TRIALS = args.numTrials
+print('Doing %d trials'%(NUM_TRIALS))
+
+if args.usePA:
+	pava = 'PA'
+
 if args.quickPolicies:
 	policies= policies[0:2]
 	print('policies quick:', policies)
 
-NUM_TRIALS = args.numTrials
-print('Doing %d trials'%(NUM_TRIALS))
 
 #envvarsList = [var+'='+str(envvars[var]) for var in envvars]
 #envvarsStr = " ".join(envvarsList)
@@ -127,51 +97,23 @@ def get_work_from_checkpoint():
 
 	return (todo, df)
 
-# open and go through a file to get the last occurence of line
-# with a particular substring. We then search this line for 
-# a floating point xtime value and return that
-def get_file_last_line_timing_match(filename, line_substring):
-
-	lines = []
-	with open(filename, 'r') as toread:
-		for line in toread:
-			if line_substring in line:
-				lines.append(line)
-
-	if len(lines) > 0:
-		# now get the last line
-		last_line = lines[len(lines)-1]
-		floats = re.findall(r"[-|+]?\d*\.?\d*[e|E]?[+|-]?\d+", last_line)
-
-		# if we have a nonzero count of floats
-		# grab the first one and use that as the timing value
-		if len(floats) > 0:
-			return float(floats[0])
-
-	return None
-
 
 def doRunForProg(prog, probSize, policy, minTrainData, trialnum, mystdout):
-	progsuffix = prog['suffix']
-	exedir = prog['exedir']
+	exedir = rootdir+prog['exedir']
+	progsuffix = prog['suffix'][1:]
+
 	exe = prog['exe']
 	exeprefix = prog['exeprefix']
-	maxruntime = prog['maxruntime']
 	datapath = prog['datapath']
 	xtimeline = prog['xtimelinesearch']
 	xtimescalefactor = float(prog['xtimescalefactor'])
 
+	apollo_data_dir = exedir+'/'+progsuffix+'-data'
+	envvars['APOLLO_OUTPUT_DIR'] = apollo_data_dir 
+
+	apollo_trial_dir = progsuffix+'-'+probSize+'-'+XTIME_FILE_PREFIX+'-trial'+str(trialnum)+'-'+pava
+
 	envvars['APOLLO_MIN_TRAINING_DATA'] = str(minTrainData)
-
-	apollo_output_dir = progsuffix[1:]+'-online-data'
-	envvars['APOLLO_OUTPUT_DIR'] = apollo_output_dir
-
-	apollo_trial_dir = progsuffix[1:]+'-'+probSize+'-trial'+str(trialnum)
-
-	if args.usePA:
-		apollo_trial_dir += '-PA'
-	else:
-		apollo_trial_dir += '-VA'
 
 	apollo_trace_dir = apollo_trial_dir + '-traces'
 	apollo_dataset_dir = apollo_trial_dir + '-datasets'
@@ -180,7 +122,6 @@ def doRunForProg(prog, probSize, policy, minTrainData, trialnum, mystdout):
 	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
 	envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
 	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir
-
 
 	# Let's go to the executable directory
 	os.chdir(exedir)
@@ -307,10 +248,14 @@ def main():
 	# If we are not the ROOT node
 	else:
 
+		stdoutFilename = APOLLO_DATA_COLLECTION_DIR+'/'+XTIME_FILE_PREFIX+'_stdout'+'/'+XTIME_FILE_PREFIX+'_stdout_rank'+str(my_rank)
+
 		if args.usePA:		
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/online_mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
+			stdoutFilename += '_PA.txt'
 		else:
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/online_mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
+			stdoutFilename += '_VA.txt'
+		
+		mystdout = open(stdoutFilename, 'a')
 
 		# redirect my stdout to use this new file
 		#sys.stdout = mystdout
