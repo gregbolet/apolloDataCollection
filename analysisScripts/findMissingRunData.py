@@ -11,26 +11,33 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from benchmarks import progs
-
-APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
-NUM_TRIALS=2
+from new_benchmarks import *
 
 policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
 #policies=['Static,policy=0', 'Static,policy=1']
 probSizes=['smallprob', 'medprob', 'largeprob']
 prognames = list(progs.keys())
 
+parser = argparse.ArgumentParser(
+    description='Launch static runs of benchmark programs using Apollo.')
+parser.add_argument('--checkType', help='Should we do a static, online, or oracle check?', default='static',
+                    type=str)
+parser.add_argument('--numTrials', help='How many trials to run with', default=10,
+                    type=int)
+
+args = parser.parse_args()
+print('I got args:', args)
+
 
 # This function will read the CSV file with data
 # and then generate a list of trials yet to finish
-def get_work_from_checkpoint(xtime_file):
-	todo = [(x,y,z,w) for x in prognames for y in probSizes for z in policies for w in range(NUM_TRIALS)]
+def get_work_from_checkpoint():
+	todo = [(x,y,z,w) for x in prognames for y in probSizes for z in policies for w in range(args.numTrials)]
 	#todo.sort()
 	print('todo', len(todo))
 	df = pd.DataFrame(columns=['progname', 'probSize', 'policy', 'trialnum', 'eteXtime'])
 
-	datafilepath = APOLLO_DATA_COLLECTION_DIR+'/'+xtime_file
+	datafilepath = APOLLO_DATA_COLLECTION_DIR+'/'+args.checkType+'-ETE-XTimeData_VA.csv'
 
 	#if the datafile exists, read from it
 	if Path(datafilepath).exists():
@@ -54,11 +61,13 @@ def get_work_from_checkpoint(xtime_file):
 def main():
 	print('Starting comparison...')
 
-	vatodo, vadf = get_work_from_checkpoint('static-ETE-XTimeData_VA.csv')
-	patodo, padf = get_work_from_checkpoint('static-ETE-XTimeData_PA.csv')
+	vatodo, vadf = get_work_from_checkpoint()
+	patodo, padf = get_work_from_checkpoint()
 
-	print('VA TODO:', len(vatodo), 'items', vatodo)
-	print('PA TODO:', len(patodo), 'items', patodo)
+	print('VA TODO:', len(vatodo), 'PA TODO:', len(patodo))
+
+	print('VA TODO:', 'items', vatodo)
+	print('PA TODO:', 'items', patodo)
 
 	return
 

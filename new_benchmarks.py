@@ -1,4 +1,5 @@
 import os
+import re
 
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
 
@@ -23,6 +24,73 @@ else:
 	#hostname='quartz'
 
 rootdir = rootdirs[hostname]
+
+# These are the default number of trials we want to run for each configuration
+NUM_TRIALS = 10
+#NUM_TRIALS = 4
+
+# These are the tags used by the MPI communicators
+ROOT_RANK = 0
+REQUEST_WORK_TAG = 11
+ACK_WORK_TAG = 12
+DONE_WORK_TAG = 13
+NEW_WORK_TAG = 14
+
+# Set the default env vars
+envvars={
+	'OMP_WAIT_POLICY':"active",
+	'OMP_PROC_BIND':"close",
+	'OMP_PLACES':"cores",
+	'APOLLO_COLLECTIVE_TRAINING':'0' ,
+	'APOLLO_LOCAL_TRAINING':'1' ,
+	'APOLLO_RETRAIN_ENABLE':'0' ,
+	'APOLLO_STORE_MODELS':'0',
+	'APOLLO_TRACE_CSV':'0',
+	'APOLLO_SINGLE_MODEL':'0' ,
+	'APOLLO_REGION_MODEL':'1' ,
+	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
+	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
+	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
+	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
+	'APOLLO_MIN_TRAINING_DATA':"0",
+	'APOLLO_PERSISTENT_DATASETS':"0",
+	'APOLLO_OUTPUT_DIR':"my-test",
+	'APOLLO_DATASETS_DIR':"my-datasets",
+	'APOLLO_TRACES_DIR':"my-traces",
+	'APOLLO_MODELS_DIR':"my-models",
+}
+
+#depending on the hostname, lets set the thread count
+# lassen is the default
+if hostname == 'quartz':
+	envvars['OMP_NUM_THREADS'] = '36'
+elif hostname == 'ruby':
+	envvars['OMP_NUM_THREADS'] = '56'
+else:
+	envvars['OMP_NUM_THREADS'] = '40'
+
+# open and go through a file to get the last occurence of line
+# with a particular substring. We then search this line for 
+# a floating point xtime value and return that
+def get_file_last_line_timing_match(filename, line_substring):
+
+	lines = []
+	with open(filename, 'r') as toread:
+		for line in toread:
+			if line_substring in line:
+				lines.append(line)
+
+	if len(lines) > 0:
+		# now get the last line
+		last_line = lines[len(lines)-1]
+		floats = re.findall(r"[-|+]?\d*\.?\d*[e|E]?[+|-]?\d+", last_line)
+
+		# if we have a nonzero count of floats
+		# grab the first one and use that as the timing value
+		if len(floats) > 0:
+			return float(floats[0])
+
+	return None
 
 # Here we define the programs we will be benchmarking with
 # all the directories are mirrored and assumed to be the same
