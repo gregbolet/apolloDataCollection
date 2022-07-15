@@ -20,6 +20,7 @@ elif 'ruby' in hostname:
 	hostname='ruby'
 else:
 	hostname='lassen'
+	#hostname='quartz'
 
 rootdir = rootdirs[hostname]
 

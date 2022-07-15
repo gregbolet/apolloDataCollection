@@ -2,21 +2,16 @@ from mpi4py import MPI
 import os
 import subprocess, shlex
 import argparse
-from benchmarks import progs
+from new_benchmarks import *
 import sys
 import time
 import pandas as pd
 import re
 from pathlib import Path
 
-my_start_time = time.time()
-
-# Assuming 5 hours max time for each MPI node for now
-LIFETIME_IN_SECS = 5 * 60 * 60
-
-# These are the number of trials we want to run for each configuration
+# These are the default number of trials we want to run for each configuration
 NUM_TRIALS = 10
-
+#NUM_TRIALS = 4
 
 ROOT_RANK = 0
 REQUEST_WORK_TAG = 11
@@ -27,7 +22,6 @@ NEW_WORK_TAG = 14
 APOLLO_DATA_COLLECTION_DIR='/usr/WS2/bolet1/apolloDataCollection'
 
 envvars={
-	'OMP_NUM_THREADS':'36',
 	'OMP_WAIT_POLICY':"active",
 	'OMP_PROC_BIND':"close",
 	'OMP_PLACES':"cores",
@@ -35,34 +29,52 @@ envvars={
 	'APOLLO_LOCAL_TRAINING':'1' ,
 	'APOLLO_RETRAIN_ENABLE':'0' ,
 	'APOLLO_STORE_MODELS':'0',
-	'APOLLO_TRACE_CSV':'1',
+	'APOLLO_TRACE_CSV':'0',
 	'APOLLO_SINGLE_MODEL':'0' ,
 	'APOLLO_REGION_MODEL':'1' ,
 	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
 	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
 	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
 	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
-	'APOLLO_TRACE_CSV_FOLDER_SUFFIX':"-test",
+	'APOLLO_MIN_TRAINING_DATA':"0",
+	'APOLLO_PERSISTENT_DATASETS':"0",
+	'APOLLO_OUTPUT_DIR':"my-test",
+	'APOLLO_DATASETS_DIR':"my-datasets",
+	'APOLLO_TRACES_DIR':"my-traces",
+	'APOLLO_MODELS_DIR':"my-models",
 }
 
-#policies=['Static,policy=0', 'Static,policy=1', 'Static,policy=2']
-#policies=['Static,policy=2']
-#policies=['Static,policy=0', 'Static,policy=1']
-#policies=['Static,policy=0']
-#policies=['DecisionTree,load-dataset,max_depth=4', 'DecisionTree,load-dataset,max_depth=2']
-policies=['DecisionTree,load-dataset,max_depth=4']
+#depending on the hostname, lets set the thread count
+# lassen is the default
+if hostname == 'quartz':
+	envvars['OMP_NUM_THREADS'] = '36'
+elif hostname == 'ruby':
+	envvars['OMP_NUM_THREADS'] = '56'
+else:
+	envvars['OMP_NUM_THREADS'] = '40'
 
+
+pava = 'VA'
+
+# we can either load the respective oracles that were generated for each benchmark
+# or we can load one yaml data file and apply that data to all the regions
+#policies=['DecisionTree,max_depth=4,load-dataset', 'DecisionTree,max_depth=4,load-dataset=']
+# let's stick with loading the region-based oracle yaml dataset files
+policies=['DecisionTree,max_depth=4,load-dataset']
 probSizes=['smallprob', 'medprob', 'largeprob']
-#probSizes=['smallprob']
-
 prognames = list(progs.keys())
 
 parser = argparse.ArgumentParser(
     description='Launch static runs of benchmark programs using Apollo.')
 parser.add_argument('--usePA', action='store_true',
                     help='Should we use PA data instead of VA?')
+parser.add_argument('--makeTraces', action='store_true',
+                    help='Should we store CSV traces?')
 parser.add_argument('--singleModel', action='store_true',
-                    help='trace filenames')
+                    help='Should we execute with single models for PA?')
+parser.add_argument('--numTrials', help='How many trials to run with', default=10,
+                    type=int)
+
 args = parser.parse_args()
 print('I got args:', args)
 
@@ -81,6 +93,16 @@ if args.usePA:
 		envvars['APOLLO_SINGLE_MODEL'] = '1'
 		envvars['APOLLO_REGION_MODEL'] = '0'
 
+if args.makeTraces:
+	envvars['APOLLO_TRACE_CSV'] = '1'
+else:
+	envvars['APOLLO_TRACE_CSV'] = '0'
+
+NUM_TRIALS = args.numTrials
+print('Doing %d trials'%(NUM_TRIALS))
+
+if args.usePA:
+	pava = 'PA'
 
 #envvarsList = [var+'='+str(envvars[var]) for var in envvars]
 #envvarsStr = " ".join(envvarsList)
@@ -129,7 +151,7 @@ def get_file_last_line_timing_match(filename, line_substring):
 	if len(lines) > 0:
 		# now get the last line
 		last_line = lines[len(lines)-1]
-		floats = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", last_line)
+		floats = re.findall(r"[-|+]?\d*\.?\d*[e|E]?[+|-]?\d+", last_line)
 
 		# if we have a nonzero count of floats
 		# grab the first one and use that as the timing value
@@ -138,39 +160,38 @@ def get_file_last_line_timing_match(filename, line_substring):
 
 	return None
 
-def convert_time_to_secs(slurm_time):
-	hrs, mins, secs = slurm_time.split(':')
+# for this we need to make sure we're in the benchmark's directory
+# and properly pointing to the datasets dir
+def doRunForProg(prog, probSize, policy, trialnum, mystdout):
+	exedir = rootdir+prog['exedir']
+	progsuffix = prog['suffix'][1:]
 
-	return (int(hrs) * 60 * 60) + (int(mins) * 60) + (int(secs))
-
-def doRunForProg(prog, probSize, policy, mystdout):
-	progsuffix = prog['suffix']
-	exedir = prog['exedir']
 	exe = prog['exe']
 	exeprefix = prog['exeprefix']
-	maxruntime = prog['maxruntime']
 	datapath = prog['datapath']
 	xtimeline = prog['xtimelinesearch']
+	xtimescalefactor = float(prog['xtimescalefactor'])
+
+
+	apollo_data_dir = exedir+'/'+progsuffix+'-data'
+	envvars['APOLLO_OUTPUT_DIR'] = apollo_data_dir 
+
+	# this output dir needs to match where the oracle put the allprobs data
+	oracle_output_dir = progsuffix+'-allprobs-oracle-'+pava
+	envvars['APOLLO_DATASETS_DIR'] = oracle_output_dir 
+
+	apollo_trial_dir = progsuffix+'-'+probSize+'-oracle-trial'+str(trialnum)+'-'+pava
+
+	apollo_trace_dir = apollo_trial_dir + '-traces'
+	apollo_models_dir = apollo_trial_dir + '-models'
+	
+	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
+	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir
 
 	# Let's go to the executable directory
 	os.chdir(exedir)
 
-	# Instead of staying in the exe dir, we need to go to the dir with the
-	# yaml data files that load-dataset will be loading in from
-	oraclepath = exedir+'/'+progsuffix[1:]
-
-	if args.usePA:
-		oraclepath += '-PA-oracle'
-	else:
-		oraclepath += '-VA-oracle'
-
-	os.chdir(oraclepath)
-
-	# Now that we're one dir in, we need to be sure to adjust the other dirs
-	# 
-
 	inputArgs=prog[probSize]
-	suffix = progsuffix+'-'+probSize+'-trial'+str(trialnum)
 
 	# String replacement for full paths to input files
 	if len(datapath) > 0:
@@ -180,29 +201,28 @@ def doRunForProg(prog, probSize, policy, mystdout):
 		replTuple = tuple([strtorep]*numtorep)
 		inputArgs = inputArgs%replTuple
 
-	if args.usePA:
-		suffix = suffix+'-PA'
-
-	name = suffix[1:]
-	envvars['APOLLO_TRACE_CSV_FOLDER_SUFFIX']=suffix
 	envvars['APOLLO_POLICY_MODEL']=policy
 	vars_to_use = {**os.environ.copy(), **envvars}
 
-	command = '../'+str(exe)+str(inputArgs)
+	command = exeprefix+'./'+str(exe)+str(inputArgs)
 
-	print('Going to execute:', command)
+	mystdout.write('using envvars:\n' + str(envvars) + '\n')
+	mystdout.write('Going to execute:'+str(command)+'\n')
 	# Get the end-to-end xtime
-	ete_xtime = time.time()
+	#ete_xtime = time.time()
+	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW)
 	subprocess.call(shlex.split(command), env=vars_to_use, stdout=mystdout, stderr=mystdout)
-	ete_xtime = time.time() - ete_xtime
+	ete_xtime = time.clock_gettime(time.CLOCK_MONOTONIC_RAW) - ete_xtime
+
+	mystdout.flush()
 
 	# now let's see if we can get the xtime from the stdout
 	if xtimeline != '':
 		file_xtime = get_file_last_line_timing_match(mystdout.name, xtimeline)
 		if file_xtime != None:
-			return file_xtime
+			return file_xtime*xtimescalefactor
 
-	return ete_xtime
+	return ete_xtime*xtimescalefactor
 
 def main():
 	print('Starting tests...')
@@ -216,6 +236,8 @@ def main():
 	workers = range(num_workers)[1:]
 	print('[%d] Starting!'%(my_rank))
 
+	print('num workers: ', num_workers)
+
 	if my_rank == ROOT_RANK:
 		workerStates = {}
 
@@ -226,11 +248,24 @@ def main():
 		# prepare the work to do
 		todo, df = get_work_from_checkpoint()
 
-		# Only do the first few experiments for testing purposes
-		#todo = todo[:25]
-
 		# while we still have work to do
-		while len(todo) != 0 :
+		while True:
+
+			# check for stopping condition
+			if len(todo) == 0:
+				# check that all the workers have a DONE_WORK_TAG
+				doneworkCount = 0
+				numworkers = 0
+				for worker in workerStates:
+					numworkers += 1
+					if workerStates[worker][0] == DONE_WORK_TAG:
+						doneworkCount += 1
+				
+				# if all the workers are waiting and there is no more work, we quit
+				if doneworkCount == numworkers:
+					break
+
+			#print('TODO is NOT empty! ')
 			# cycle through each worker and give them some work
 			for worker in workerStates:
 				workerState = workerStates[worker][0]
@@ -241,6 +276,7 @@ def main():
 					#print('DONE_WORK_TAG')
 					if len(todo) != 0:
 						work = todo.pop(0)
+						print('Gonna work on: ', work)
 						req = comm.isend(work, dest=worker, tag=NEW_WORK_TAG)
 						workerStates[worker] = (REQUEST_WORK_TAG, req)
 				elif workerState == REQUEST_WORK_TAG:
@@ -255,14 +291,14 @@ def main():
 					isDone, responseData = workerReq.test()
 					if isDone:
 						print('worker completed with message: ', responseData)
-						progname = responseData[1][0]
-						probSize = responseData[1][1]
-						policy   = responseData[1][2]
-						trialnum = responseData[1][3]
-						eteXtime = responseData[2]
+						progname 		 = responseData[1][0]
+						probSize 		 = responseData[1][1]
+						policy   		 = responseData[1][2]
+						trialnum     = responseData[1][3]
+						eteXtime     = responseData[2]
 						dataToAdd = {'progname': progname, 'probSize': probSize,
-												 'policy': policy, 'trialnum': trialnum,
-												 'eteXtime': eteXtime}
+												 'policy': policy,
+												 'trialnum': trialnum, 'eteXtime': eteXtime}
 						toAppend = pd.DataFrame([dataToAdd])
 						df = pd.concat([df, toAppend], ignore_index=True)
 						df.to_csv(OUTPUT_XTIME_FILE, index=False)
@@ -277,34 +313,30 @@ def main():
 	else:
 
 		if args.usePA:		
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_oracle_rank'+str(my_rank)+'_PA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/oracle_mpi_stdout_rank'+str(my_rank)+'_PA.txt', 'a')
 		else:
-			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/mpi_stdout_oracle_rank'+str(my_rank)+'_VA.txt', 'a')
+			mystdout = open(APOLLO_DATA_COLLECTION_DIR+'/oracle_mpi_stdout_rank'+str(my_rank)+'_VA.txt', 'a')
 
+		# redirect my stdout to use this new file
+		#sys.stdout = mystdout
 
 		while True:
 			# Get some new work
 			req = comm.irecv(source=ROOT_RANK, tag=NEW_WORK_TAG)
 			mywork = req.wait()
 			if mywork == None:
-				print('[%d] DONE: ran out of work!'%(my_rank))
+				mystdout.write('[%d] DONE: ran out of work!\n'%(my_rank))
 				break
 
-			max_time = convert_time_to_secs(progs[mywork[0]]['maxruntime'])
-			alive_time = time.time() - my_start_time
-			if (alive_time + max_time) >= LIFETIME_IN_SECS:
-				print('unable to continue, not enough time for %s, alive for %f[/%f] secs'%(mywork, alive_time, LIFETIME_IN_SECS))
-				break
-
-			print('[%d] I got work: %s'%(my_rank, mywork))
+			mystdout.write('[%d] I got work: %s\n'%(my_rank, mywork))
 			# DO WORK HERE
 			# DO WORK HERE
 			# DO WORK HERE
 			# write to the output file so we know what run this was
 			#mystdout.write('PERFORMING TEST FOR: '+str(mywork)+'\n')	
-			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mystdout)
-			print('[%d] work completed in %f seconds!'%(my_rank, ete_xtime))
-			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime, mywork[3]), dest=ROOT_RANK, tag=DONE_WORK_TAG)
+			ete_xtime = doRunForProg(progs[mywork[0]], mywork[1], mywork[2], mywork[3], mystdout)
+			mystdout.write('[%d] work completed in %f seconds!\n'%(my_rank, ete_xtime))
+			req = comm.isend((DONE_WORK_TAG, mywork, ete_xtime), dest=ROOT_RANK, tag=DONE_WORK_TAG)
 			req.wait()
 
 
@@ -312,6 +344,7 @@ def main():
 			#command = 'grep -rni "launched"'
 			# try to launch a command
 			#subprocess.call(shlex.split(command))
+		mystdout.close()
 	return
 
 main()
