@@ -4,5 +4,6 @@
 # Leave all the python files
 #!*.txt
 !*.py
+!*.ipynb
 !.gitignore
 !*.sh

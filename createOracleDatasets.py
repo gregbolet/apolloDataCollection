@@ -79,7 +79,7 @@ def main():
 
 				command += '--tracedirs '
 				# gather all the trial directories and add them to the command
-				trialdirs = list(glob.glob('%s/%s-%s-trial*-%s-traces/' % (apollo_data_dir, progsuffix, probSize, pava)))
+				trialdirs = list(glob.glob('%s/%s-%s-*trial*-%s-traces/' % (apollo_data_dir, progsuffix, probSize, pava)))
 				for trialdir in trialdirs: 
 					command += trialdir+' '
 

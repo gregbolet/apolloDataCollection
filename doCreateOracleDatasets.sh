@@ -8,5 +8,5 @@
 
 source ~/.profile
 
-srun python3 createOracleDatasets.py --onlyAllProbs
-srun python3 createOracleDatasets.py --onlyAllProbs --usePA
+srun python3 createOracleDatasets.py --onlyAllProbs --benchmarks lulesh
+srun python3 createOracleDatasets.py --onlyAllProbs --benchmarks lulesh --usePA

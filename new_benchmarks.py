@@ -21,7 +21,7 @@ elif 'ruby' in hostname:
 	hostname='ruby'
 else:
 	hostname='lassen'
-	#hostname='quartz'
+	hostname='quartz'
 
 rootdir = rootdirs[hostname]
 
@@ -51,7 +51,7 @@ envvars={
 	'APOLLO_GLOBAL_TRAIN_PERIOD':'0',
 	'APOLLO_ENABLE_PERF_CNTRS':'0' ,
 	'APOLLO_PERF_CNTRS_MLTPX':'0' ,
-	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS,PAPI_TOT_INS" ,
+	'APOLLO_PERF_CNTRS':"PAPI_DP_OPS" ,
 	'APOLLO_MIN_TRAINING_DATA':"0",
 	'APOLLO_PERSISTENT_DATASETS':"0",
 	'APOLLO_OUTPUT_DIR':"my-test",

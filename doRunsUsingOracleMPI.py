@@ -119,7 +119,7 @@ def doRunForProg(prog, probSize, policy, trialnum, mystdout):
 	apollo_models_dir = apollo_trial_dir + '-models'
 	
 	envvars['APOLLO_TRACES_DIR'] = apollo_trace_dir
-	envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
+	#envvars['APOLLO_DATASETS_DIR'] = apollo_dataset_dir
 	envvars['APOLLO_MODELS_DIR'] = apollo_models_dir
 
 	# Let's go to the executable directory
