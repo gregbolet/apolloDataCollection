@@ -15,5 +15,5 @@
 # srun -n8 -N8 --partition=pdebug --time="00:05:00" --open-mode=truncate --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
 source ~/.profile
 
-srun python3 doCounterVariabilityRunsMPI.py --usePA --quickPolicies --numTrials 5 --makeTraces
-srun python3 doCounterVariabilityRunsMPI.py --usePA --numTrials 5 --makeTraces
+srun python3 doCounterVariabilityRunsMPI.py --usePA --quickPolicies --numTrials 10 --makeTraces
+srun python3 doCounterVariabilityRunsMPI.py --usePA --numTrials 10 --makeTraces
