@@ -15,11 +15,12 @@ export APOLLO_SINGLE_MODEL=0
 export APOLLO_REGION_MODEL=1 
 export APOLLO_GLOBAL_TRAIN_PERIOD=0
 export APOLLO_ENABLE_PERF_CNTRS=1
+export APOLLO_PERF_CNTRS_SAMPLE_EACH_ITER=0
 export APOLLO_PERF_CNTRS_MLTPX=0
-export APOLLO_PERF_CNTRS="PAPI_LD_INS" 
+export APOLLO_PERF_CNTRS="PAPI_TOT_INS" 
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,load-dataset"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,explore=RoundRobin"
-export APOLLO_POLICY_MODEL="Static,policy=2"
+export APOLLO_POLICY_MODEL="Static,policy=0"
 
 # Train a model after gathering X unique features for each region
 export APOLLO_MIN_TRAINING_DATA=0
