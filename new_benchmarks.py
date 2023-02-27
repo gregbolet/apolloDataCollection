@@ -58,6 +58,7 @@ envvars={
 	'APOLLO_DATASETS_DIR':"my-datasets",
 	'APOLLO_TRACES_DIR':"my-traces",
 	'APOLLO_MODELS_DIR':"my-models",
+	'APOLLO_PERF_CNTRS_SAMPLE_EACH_ITER':"0",
 }
 
 #depending on the hostname, lets set the thread count

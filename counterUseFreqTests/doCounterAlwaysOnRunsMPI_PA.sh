@@ -15,7 +15,7 @@
 # srun -n8 -N8 --partition=pdebug --time="00:05:00" --open-mode=truncate --output=mpiRunLogs.txt python3 doStaticRunsMPI.py
 source ~/.profile
 
-NUM_TRIALS=3
+NUM_TRIALS=10
 
 srun python3 doCounterAlwaysOnRunsMPI.py --usePA --quickPolicies --numTrials $NUM_TRIALS --makeTraces
 srun python3 doCounterAlwaysOnRunsMPI.py --usePA --numTrials $NUM_TRIALS --makeTraces
