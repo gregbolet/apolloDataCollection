@@ -7,3 +7,12 @@
 !*.ipynb
 !.gitignore
 !*.sh
+!slurmBayesianOptim
+!slurmSensitivityAnalysis
+!analysisScripts
+!counterUseFreqTests
+!counterVariationTests
+!dualKnobTesting
+!dualKnobTestingViaPolicies
+!nasFTBayesianOptimGuidedTuning
+!partialSpaceExploration
