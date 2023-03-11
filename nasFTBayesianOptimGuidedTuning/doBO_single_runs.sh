@@ -3,7 +3,7 @@
 #SBATCH --ntasks=1                  # Number of MPI tasks (i.e. processes)
 #SBATCH --nodes=1                    # Maximum number of nodes to be allocated
 #SBATCH --time=8:00:00              
-#SBATCH --output=single_node_runlogs.txt     
+#SBATCH --output=single_node_runlogs_with_static_start_data.txt     
 #SBATCH --open-mode=truncate
 #ignore SBATCH --partition=pdebug
 
@@ -16,4 +16,4 @@
 source ~/.profile
 source ~/workspace/gregvirtenv/bin/activate
 
-srun python3 bayesianOptim_single_node.py --numPolicies=16
+srun python3 bayesianOptim_single_node.py --doStaticRuns --numPolicies=16

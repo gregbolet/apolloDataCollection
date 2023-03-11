@@ -55,7 +55,7 @@ class GPModel:
 					 'bounds = ' + str(self.pbounds)
 
 	# raw_sched is a dictionary
-	def get_sched_dict_from_list(self, raw_sched):
+	def get_region_dict_from_sched_dict(self, raw_sched):
 		sched = {region: [] for region in self.regions}
 
 		for idx,policy in raw_sched.items():
@@ -68,7 +68,7 @@ class GPModel:
 	def write_schedule(self, raw_sched, targetDir):
 		# The raw input schedule is just an ordered list of policies for each region execution
 		# We're going to convert it to a dictionary
-		sched = self.get_sched_dict_from_list(raw_sched)
+		sched = self.get_region_dict_from_sched_dict(raw_sched)
 		print('floored schedule',sched)
 
 		# for each region, let's write a file with its schedule
@@ -160,12 +160,8 @@ class GPModel:
 		self.optim.register( params=x, target=y)
 		return
 
-	def get_total_xtimes_from_csvs(self, dir):
-
-		return
-
-	# we assume that sched is just a vector of policies for each region execution
 	def run_prog_with_sched(self, sched):
+		# sched is of type dictionary, mapping each region execution index to a policy
 
 		exedir = rootdir+self.prog['exedir']
 		progsuffix = self.prog['suffix'][1:]
@@ -227,13 +223,12 @@ class GPModel:
 
 		self.executedIters += 1
 
-		# now let's see if we can get the xtime from the stdout
-		if xtimeline != '':
-			file_xtime = get_file_last_line_timing_match(mystdoutpath, xtimeline)
-			if file_xtime != None:
-				return file_xtime*xtimescalefactor
-
-		return ete_xtime*xtimescalefactor
+		# since we're tuning the entire application
+		# we're going to use the ete_xtime as our target value
+		# The printed xtime from each program may only time some
+		# of the region executions, but not all of the ones
+		# that we have control over
+		return ete_xtime
 
 
 	def iterate(self):
@@ -254,6 +249,77 @@ class GPModel:
 		self.update_GP_model(x, -y)
 		return (x,y)
 
+	# This will run the benchmark and gather the static execution data
+	def gather_static_run_data(self, chkpt):
+		keys = [ i for i in range(self.numRegionExecs)]
+
+		# for each policy, build a schedule vector and execute with it
+		for policy in range(self.numPolicies):
+			vals = [policy]*self.numRegionExecs
+			x = dict(zip(keys, vals))
+			y = self.run_prog_with_sched(x)
+			chkpt.add_new_point(x,y)
+			self.update_GP_model(x, -y)
+
+		return
+
+
+
+class CSVCheckpointer:
+	def __init__(self, checkpointFilename, numRegionExecs):
+		# get the current directory and make the filename a FULL path
+		cwd = str(os.getcwd())
+		self.checkpointFilename = cwd+'/'+checkpointFilename
+		self.numRegionExecs = numRegionExecs
+
+		# check if the checkpoint exists
+		chkptFile = Path(self.checkpointFilename)
+
+		# if the checkpoint file does not exist
+		if not chkptFile.is_file():
+			# create the df with just the header
+			self.df = pd.DataFrame(columns = ['xtime']+['f'+str(i) for i in range(self.numRegionExecs)], dtype=float)
+
+			# write the file out
+			self.df.to_csv(self.checkpointFilename, index=False)
+		else:
+			# read in the checkpoint file
+			self.df = pd.read_csv(checkpointFilename)
+		
+		return
+
+	def add_new_point(self, x, y):
+		# convert x dictionary into an array
+		csvRow = pd.DataFrame([[y]+list(x.values())], dtype=float)
+
+		# add the data to the dataframe
+		self.df = pd.concat([self.df, csvRow])
+
+		# append to the checkpoint, better than re-writing the whole file
+		csvRow.to_csv(self.checkpointFilename, mode='a', index=False, header=False)
+		return
+
+	def get_checkpoint_data(self):
+		# return a list of tuples in the form of [(x,y), (x,y), (x,y)]
+		# where x is a dictionary and y is an xtime float 
+		# this allows us to easily add points to the GP model 
+
+		toReturn = []
+		keys = [ i for i in range(self.numRegionExecs)]
+
+		for index, row in self.df.iterrows():
+			# go through all the elements in this row
+			vals = list(row[1:])
+			x = dict(zip(keys, vals))
+			y = row[0]
+			toReturn.append((x,y))
+
+		return toReturn
+
+	def was_point_already_sampled(self, x):
+		return
+
+
 def parse_input_args():
 	parser = argparse.ArgumentParser(description='Guide tuning of the FT benchmark using Bayesian Optimization')
 	parser.add_argument('--kernel', help='What scikitlearn kernel to use (with default params)', default='Matern', type=str)
@@ -269,6 +335,11 @@ def parse_input_args():
 	# numRegionExecs is just a sanity check for when we pull a sample execution schedule
 	parser.add_argument('--numRegionExecs', help='Number of region executions of the program', default=111, type=int)
 	parser.add_argument('--numPolicies', help='Number of policies to explore', default=24, type=int)
+	parser.add_argument('--chkptCSV', help='Name of the CSV file to write checkpoints to', default='savedRuns.csv', type=str)
+
+
+	parser.add_argument('--doStaticRuns', action='store_true', help='Should be do pre-training static runs?')
+
 
 	args = parser.parse_args()
 	print('I got args:', args)
@@ -279,21 +350,35 @@ def main():
 	model = GPModel(args.prog, args.probSize, args.kernel, args.acqFnct, args.priorSamples, 
 									 args.iters, args.numPolicies, args.numRegionExecs)
 
+	chkpt = CSVCheckpointer(args.chkptCSV, args.numRegionExecs)
+
+	# get the checkpoint data and add it to the model
+	for datapoint in chkpt.get_checkpoint_data():
+		print('adding pre-trained point', datapoint)
+		x = datapoint[0]
+		y = datapoint[1]
+		model.update_GP_model(x, -y)
+
+	if args.doStaticRuns:
+		model.gather_static_run_data(chkpt)
+
 	bestxtime = 1000
 	bestpolicy = None
 	xtimes = []
 	xtime = 1000.0
-	while xtime > 10.0:
+	# stop when we find an xtime that beats out the best static xtime
+	while xtime > 10.77:
 		policy, xtime = model.iterate()
+		chkpt.add_new_point(policy, xtime)
 		xtimes.append(xtime)
 		print('execution times thus far: ', xtimes)
 		if xtime < bestxtime:
-			print('new best xtime found!', xtime, '\npolicy', policy, '\n', model.get_sched_dict_from_list(policy))
+			print('new best xtime found!', xtime, '\npolicy', policy, '\n', model.get_region_dict_from_sched_dict(policy))
 			bestxtime = xtime
 			bestpolicy = policy
 
 	print('finished iterating')
-	print('best xtime and policy', bestxtime, '\npolicy', bestpolicy, '\n', model.get_sched_dict_from_list(bestpolicy))
+	print('best xtime and policy', bestxtime, '\npolicy', bestpolicy, '\n', model.get_region_dict_from_sched_dict(bestpolicy))
 	return
 
 if __name__ == "__main__":

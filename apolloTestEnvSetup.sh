@@ -10,7 +10,7 @@ export APOLLO_COLLECTIVE_TRAINING=0
 export APOLLO_LOCAL_TRAINING=1 
 export APOLLO_RETRAIN_ENABLE=0 
 export APOLLO_STORE_MODELS=0
-export APOLLO_TRACE_CSV=1
+export APOLLO_TRACE_CSV=0
 export APOLLO_SINGLE_MODEL=0 
 export APOLLO_REGION_MODEL=1 
 export APOLLO_GLOBAL_TRAIN_PERIOD=0
@@ -23,8 +23,8 @@ export CHOICE_COUNTER="PAPI_L3_LDM"
 export APOLLO_PERF_CNTRS="$CHOICE_COUNTER"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,load-dataset"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,explore=RoundRobin"
-#export APOLLO_POLICY_MODEL="Static,policy=0"
-export APOLLO_POLICY_MODEL="Optimal"
+export APOLLO_POLICY_MODEL="Static,policy=0"
+#export APOLLO_POLICY_MODEL="Optimal"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,load-dataset=/g/g15/bolet1/workspace/benchmarks/NPB/SNU_NPB_2019/NPB3.3-OMP-C/bin/sp-data/sp-medprob-PAPI_TOT_INS-ORACLE-alwaysOn-PA/Dataset-single-model.yaml"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=7,load-dataset=sp-data/sp-medprob-${CHOICE_COUNTER}-ORACLE-uniqueFeat-PA/Dataset-single-model.yaml"
 #export APOLLO_POLICY_MODEL="DecisionTree,max_depth=4,load-dataset=sp-data/sp-medprob-${CHOICE_COUNTER}-ORACLE-alwaysOn-PA/Dataset-single-model.yaml"
