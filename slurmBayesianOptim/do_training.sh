@@ -3,7 +3,7 @@
 #SBATCH --nodes=1                    # Maximum number of nodes to be allocated
 #SBATCH --open-mode=truncate
 #SBATCH --time=08:00:00
-#SBATCH --output=training_runlog_cg.txt
+#SBATCH --output=training_runlog_lulesh.txt
 #ignore SBATCH --partition=pdebug
 #SBATCH --job-name=BO_Training
 
@@ -15,4 +15,6 @@ source ~/workspace/gregvirtenv/bin/activate
 
 #python3 tuneRegionsMain.py --numPolicies=12 --progName=nas_ft --numTrials=5 --timeCap=0:03:00 --numRegionExecs=111 --perRegion
 #python3 tuneRegionsMain.py --numPolicies=12 --progName=nas_ft --numTrials=1 --timeCap=0:03:00 --numRegionExecs=111 --perRegion --doStaticRuns
-python3 tuneRegionsMain.py --numPolicies=12 --progName=nas_cg --numTrials=3 --timeCap=0:04:00 --numRegionExecs=230 --perRegion --doStaticRuns
+#python3 tuneRegionsMain.py --numPolicies=12 --progName=nas_cg --numTrials=3 --timeCap=0:04:00 --numRegionExecs=230 --perRegion --doStaticRuns
+#python3 tuneRegionsMain.py --numPolicies=12 --progName=lulesh --numTrials=3 --timeCap=0:15:00 --numRegionExecs=11375000 --perRegion --doStaticRuns
+python3 tuneRegionsMain.py --numPolicies=12 --progName=lulesh --numTrials=3 --timeCap=0:15:00 --numRegionExecs=11375000 --perRegion

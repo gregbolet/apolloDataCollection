@@ -351,22 +351,22 @@ progs={
 				 'largeprob':'-m event -t 36 -k 1 -s XL'
 				},
 
-	#		 'lulesh':{
-	#			 'exedir':'lulesh-region-fix-correct/LULESH/build',
-	#			 'exe':'lulesh2.0 ',
-	#			 'exeprefix':'',
-	#			 'suffix':'-lulesh',
-	#			 'datapath':'',
-	#			 'builddir':'lulesh-region-fix-correct/LULESH/build',
-	#			 'buildcmd':'make',
-	#			 'cleandir':'lulesh-region-fix-correct/LULESH/build',
-	#			 'cleancmd':'make clean',
-	#			 'xtimelinesearch':'Elapsed time',
-	#			 'xtimescalefactor': 1,
-	#			 'maxruntime':'01:00:00',
-	#			 'smallprob':'-s 30 -r 100 -b 0 -c 8 -i 1000',
-	#			 'medprob':  '-s 55 -r 100 -b 0 -c 8 -i 1000',
-	#			 'largeprob':'-s 80 -r 100 -b 0 -c 8 -i 1000'
-	#			}
+			 'lulesh':{
+				 'exedir':'lulesh-region-fix-correct/LULESH/build',
+				 'exe':'lulesh2.0 ',
+				 'exeprefix':'',
+				 'suffix':'-lulesh',
+				 'datapath':'',
+				 'builddir':'lulesh-region-fix-correct/LULESH/build',
+				 'buildcmd':'make',
+				 'cleandir':'lulesh-region-fix-correct/LULESH/build',
+				 'cleancmd':'make clean',
+				 'xtimelinesearch':'Elapsed time',
+				 'xtimescalefactor': 1,
+				 'maxruntime':'01:00:00',
+				 'smallprob':'-s 30 -r 100 -b 0 -c 8 -i 1000',
+				 'medprob':  '-s 55 -r 100 -b 0 -c 8 -i 1000',
+				 'largeprob':'-s 80 -r 100 -b 0 -c 8 -i 1000'
+				},
 
 }

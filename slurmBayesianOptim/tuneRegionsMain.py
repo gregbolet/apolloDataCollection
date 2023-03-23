@@ -61,6 +61,7 @@ class ScheduleHelper:
 		# read in the csvs in the first directory
 		execDataDF = self.read_csvs_in_dir(dirs[0])
 
+		print(execDataDF.columns)
 		print(execDataDF.head())
 		# let's focus on only particular rows so we can then drop duplicates
 		execDataDF = execDataDF[['region', 'globalidx']].drop_duplicates()
@@ -82,7 +83,8 @@ class ScheduleHelper:
 		for region in regions:
 			mapping[region] = list(execDataDF[execDataDF['region'] == region]['globalidx'])
 
-		print('regionExecMap', mapping)
+		#print('regionExecMap', mapping)
+		print('regionExecMap found')
 		# this maps region names to a list of global region execution indices
 		self.regionExecMap = mapping
 
@@ -144,7 +146,8 @@ class ScheduleHelper:
 		# The raw input schedule is just an ordered list of policies for each region execution
 		# We're going to convert it to a dictionary
 		sched = self.get_region_dict_from_sched_dict(raw_sched)
-		print('floored schedule',sched)
+		#print('floored schedule',sched)
+		print('floored schedule')
 
 		# for each region, let's write a file with its schedule
 		for region in sched:
@@ -209,7 +212,7 @@ class BOJobManager:
 		)
 
 		# utility function = acquisition function
-		self.util = UtilityFunction(kind=acqFnct, kappa=10)
+		self.util = UtilityFunction(kind=acqFnct, kappa=5)
 
 		return
 
@@ -502,7 +505,8 @@ def main():
 
 	# get the checkpoint data and add it to the model
 	for datapoint in chkpt.get_checkpoint_data():
-		print('adding pre-trained point', datapoint)
+		#print('adding pre-trained point', datapoint)
+		print('adding pre-trained point')
 		x = datapoint[0]
 		y = datapoint[1]
 		jobman.update_GP_model(x, -y)
@@ -515,7 +519,7 @@ def main():
 	xtimes = []
 	xtime = 1000.0
 	# stop when we find an xtime that beats out the best static xtime
-	while xtime > 10.77:
+	while True:
 		policy, xtime = jobman.iterate()
 		chkpt.add_new_point(policy, xtime)
 		xtimes.append(xtime)
