@@ -10,7 +10,7 @@ export APOLLO_COLLECTIVE_TRAINING=0
 export APOLLO_LOCAL_TRAINING=1 
 export APOLLO_RETRAIN_ENABLE=0 
 export APOLLO_STORE_MODELS=0
-export APOLLO_TRACE_CSV=0
+export APOLLO_TRACE_CSV=1
 export APOLLO_SINGLE_MODEL=0 
 export APOLLO_REGION_MODEL=1 
 export APOLLO_GLOBAL_TRAIN_PERIOD=0
@@ -41,7 +41,7 @@ export APOLLO_DATASETS_DIR="my-datasets"
 export APOLLO_TRACES_DIR="my-traces"
 export APOLLO_MODELS_DIR="my-models"
 
-#export APOLLO_OUTPUT_DIR="./bt-data"
+export APOLLO_OUTPUT_DIR="./lulesh-data"
 #export APOLLO_DATASETS_DIR="bt-allprobs-oracle-VA"
-#export APOLLO_TRACES_DIR="my-traces"
+export APOLLO_TRACES_DIR="lulesh-medprob-Static,policy=0-trial0-VA-traces"
 #export APOLLO_MODELS_DIR="my-models"

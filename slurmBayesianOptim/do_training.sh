@@ -4,7 +4,7 @@
 #SBATCH --open-mode=truncate
 #SBATCH --time=08:00:00
 #SBATCH --output=training_runlog_lulesh.txt
-#ignore SBATCH --partition=pdebug
+#SBATCH --partition=pdebug
 #SBATCH --job-name=BO_Training
 
 #policy ranges  --> 36, 34, 30, 26, 22, 18, 16, 12,  8,  4,  1, 72

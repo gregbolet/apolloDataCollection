@@ -158,8 +158,12 @@ class ScheduleHelper:
 
 			# we will overwrite whatever file has this name in the provided dir
 			with open(filename, 'w') as towrite:
-				strlist = [str(i) for i in sched[region]]
+				# write out integers instead of floats
+				strlist = [str(int(i)) for i in sched[region]]
 				towrite.write(','.join(strlist))
+				# for really large/long writes, we need to force the flush
+				towrite.flush()
+				os.fsync(towrite)
 
 		return
 
@@ -186,6 +190,16 @@ class BOJobManager:
 		self.perRegion = perRegion
 
 		self.schedHelper = ScheduleHelper(progname, numRegionExecs, probSize, perRegion)
+
+		# this is used to name the dir where all our outputfiles will go
+		# so we can do multiple runs of the same program side-by-side
+		self.runs_identifier = int(time.time())
+
+		self.outputFileDir = APOLLO_DATA_COLLECTION_DIR+'/outputfiles/'+self.progname+'-'+self.probSize+'-ID'+str(self.runs_identifier)
+
+		# check that the outputfile dir exists, otherwise create it
+		if not os.path.exists(self.outputFileDir):
+			os.makedirs(self.outputFileDir)
 
 		self.numRegions = len(self.schedHelper.regions)
 
@@ -234,26 +248,34 @@ class BOJobManager:
 	# completed. Another big assumption is that there only exists
 	# one xtime floating point in the file. This will read all the
 	# matches in the file and extract the last one.
-	def get_run_xtime(self, outputFilename):
+	def get_run_xtimes(self, outputFilename):
 		# check if the file exists
 
 		outfile = Path(outputFilename)
 
-		# if the checkpoint file does not exist
+		# if the checkpoint file does exist
 		if outfile.is_file():
 			with open(outputFilename, 'r') as toread:
 				all_text = toread.read()
 				# if the job finished, extract the xtime
 				if 'logout' in all_text:
-					matches = re.findall(r"[-+]?(?:\d*\.*\d+)", all_text)
-					return float(matches[-1])
+					# split all_text into lines
+					lines = all_text.split('\n')
+					found_xtimes = []
 
-		return 0.0
+					for line in lines:
+						if 'TRIAL_RESULT_XTIME' in line:
+							matches = re.findall(r"[-+]?(?:\d*\.*\d+)", line)
+							found_xtimes.append(float(matches[-1]))
+
+					return found_xtimes
+		return [0.0]
 
 	# This will stall us if not all the jobs are completed
 	# we want this behavior because for BO we need to wait for
 	# the runs to complete anyways.
 	# jobs is just an array of output filenames to be read
+	# Note: each job would have it's xtimes averaged
 	def wait_for_jobs_to_complete(self, jobs):
 		numJobs = len(jobs)
 		jobStatus = [0.0]*numJobs
@@ -262,9 +284,20 @@ class BOJobManager:
 		# sum to the numJobs
 		while sum([ int(i != 0.0) for i in jobStatus]) != numJobs:
 			for idx,job in enumerate(jobs):
-				jobStatus[idx] = self.get_run_xtime(job)
+				xtimes = self.get_run_xtimes(job)
+				jobStatus[idx] = np.mean(xtimes)
 
 		return jobStatus
+
+	def wait_for_single_job_to_complete(self, job):
+		jobStatus = 0.0
+		xtimes = []
+
+		while jobStatus == 0.0:
+			xtimes = self.get_run_xtimes(job)
+			jobStatus = np.mean(xtimes) 
+
+		return xtimes
 
 	def launch_run(self, envvars, outfileName, timeCap):
 
@@ -274,7 +307,9 @@ class BOJobManager:
 
 		jobName = self.progname+'-run'
 
-		outputFile = APOLLO_DATA_COLLECTION_DIR+'/outputfiles/'+outfileName
+		outputFile = self.outputFileDir+'/'+outfileName
+
+		envvars['LOGGING_OUTPUT_FILE_NAME'] = outputFile
 
 		command = 'sbatch --output='+outputFile+' --time='+timeCap+' --job-name='+jobName+ ' ./run_single_benchmark.sh'
 		print('executing command:', command)
@@ -344,6 +379,9 @@ class BOJobManager:
 		else:
 			keys = [ i for i in range(self.numRegionExecs)]
 
+		# map each policy to their respective mean xtimes
+		jobFiles = {}
+
 		# for each policy, build a schedule vector and execute with it
 		for policy in range(self.numPolicies):
 			vals = None
@@ -354,23 +392,30 @@ class BOJobManager:
 
 			x = dict(zip(keys, vals))
 
-			jobFiles = []
-
 			# we are not doing traced runs
 			envvars = self.setup_run_with_sched(x)
+			envvars['NUM_REPEAT_TRIALS_TO_RUN'] = str(self.numTrials)
 
-			for i in range(self.numTrials):
-				outfileName = self.progname+'-'+self.probSize+'-static-pol' + str(policy)+ 'trial'+str(i)+'.txt'
-				outfile = self.launch_run(envvars, outfileName, self.timeCap)
-				jobFiles.append(outfile)
+			outfileName = self.progname+'-'+self.probSize+'-static-pol' + str(policy)+ 'trials'+str(self.numTrials)+'.txt'
+			outfile = self.launch_run(envvars, outfileName, self.timeCap)
 
-			xtimes = self.wait_for_jobs_to_complete(jobFiles)
-			print('Got xtimes of', xtimes)
+			jobFiles[policy] = (x, outfile)
+
+		# now that we launched all the static runs, let's wait for them to finish
+		# we will receive their mean xtimes in return
+		#mean_xtimes = self.wait_for_jobs_to_complete(list(jobFiles.values()))
+
+		for idx,jobInfo in enumerate(list(jobFiles.items())):
+			policy,val = jobInfo
+			x , outfile = val
+			print('waiting for', outfile, policy)
+			# this is a blocking call unfortunately
+			xtimes = self.wait_for_single_job_to_complete(outfile)
+			print(outfile, 'got xtimes of', xtimes)
 		
 			y = np.mean(xtimes)
 			print('mean xtime of: ', y)
-
-			chkpt.add_new_point(x,y)
+			chkpt.add_new_point(x, y)
 			self.update_GP_model(x, -y)
 
 		return
@@ -385,18 +430,15 @@ class BOJobManager:
 			#x[idx] = int(policy)
 			x[idx] = round(policy, 0)
 
-		jobFiles = []
-
 		# we are not doing traced runs
 		envvars = self.setup_run_with_sched(x)
+		envvars['NUM_REPEAT_TRIALS_TO_RUN'] = str(self.numTrials)
 
-		for i in range(self.numTrials):
-			outfileName = self.progname+'-'+self.probSize+'-iter' + str(self.executedIters)+ 'trial'+str(i)+'.txt'
-			outfile = self.launch_run(envvars, outfileName, self.timeCap)
-			jobFiles.append(outfile)
+		outfileName = self.progname+'-'+self.probSize+'-iter' + str(self.executedIters)+ 'trials'+str(self.numTrials)+'.txt'
+		outfile = self.launch_run(envvars, outfileName, self.timeCap)
 
-		xtimes = self.wait_for_jobs_to_complete(jobFiles)
-		print('Got xtimes of', xtimes)
+		xtimes = self.wait_for_single_job_to_complete(outfile)
+		print(outfile, 'got xtimes of', xtimes)
 		
 		y = np.mean(xtimes)
 		print('mean xtime of: ', y)
