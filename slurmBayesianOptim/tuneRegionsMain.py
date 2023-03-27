@@ -15,7 +15,7 @@ from bayes_opt import UtilityFunction
 from sklearn.gaussian_process.kernels import Matern, DotProduct, RationalQuadratic, RBF
 from sklearn.gaussian_process import GaussianProcessRegressor
 
-RANDOM_STATE_SEED = 1783
+RANDOM_STATE_SEED = 17832
 
 class ScheduleHelper:
 	def __init__(self, progname, numRegionExecs, probSize, perRegion):
@@ -222,7 +222,8 @@ class BOJobManager:
 		self.optim = BayesianOptimization(
 		    f=None,
 		    pbounds=self.pbounds,
-				random_state=RANDOM_STATE_SEED
+				random_state=RANDOM_STATE_SEED,
+				allow_duplicate_points=True
 		)
 
 		# utility function = acquisition function
@@ -258,7 +259,7 @@ class BOJobManager:
 			with open(outputFilename, 'r') as toread:
 				all_text = toread.read()
 				# if the job finished, extract the xtime
-				if 'logout' in all_text:
+				if ('logout' in all_text) or ('slurmstepd: error:' in all_text):
 					# split all_text into lines
 					lines = all_text.split('\n')
 					found_xtimes = []
@@ -267,6 +268,10 @@ class BOJobManager:
 						if 'TRIAL_RESULT_XTIME' in line:
 							matches = re.findall(r"[-+]?(?:\d*\.*\d+)", line)
 							found_xtimes.append(float(matches[-1]))
+
+					# if the program never finished and we timed out, return a junk result
+					if len(found_xtimes) == 0:
+						return [100000.0]
 
 					return found_xtimes
 		return [0.0]
@@ -320,7 +325,7 @@ class BOJobManager:
 		return outputFile
 
 	# this will test one schedule for numTrials amount of times
-	def setup_run_with_sched(self, sched):
+	def setup_run_with_sched(self, sched, isStaticSched=False, staticPol=0):
 		# sched is of type dictionary, mapping each region execution index to a policy
 
 		exedir = rootdir+self.prog['exedir']
@@ -335,7 +340,11 @@ class BOJobManager:
 		apollo_data_dir = exedir+'/'+progsuffix+'-data'
 
 		# all these are local to the apollo data dir
-		apollo_trial_dir = progsuffix+'-'+self.probSize+'-BO_guided-iter='+str(self.executedIters)
+		apollo_trial_dir = ""
+		if isStaticSched:
+			apollo_trial_dir = progsuffix+'-'+self.probSize+'-Static,policy='+str(staticPol)
+		else:
+			apollo_trial_dir = progsuffix+'-'+self.probSize+'-BO_guided-iter='+str(self.executedIters)
 		apollo_trace_dir = apollo_trial_dir + '-traces'
 		apollo_dataset_dir = apollo_trial_dir + '-datasets'
 		apollo_models_dir = apollo_trial_dir + '-models'
@@ -393,7 +402,7 @@ class BOJobManager:
 			x = dict(zip(keys, vals))
 
 			# we are not doing traced runs
-			envvars = self.setup_run_with_sched(x)
+			envvars = self.setup_run_with_sched(x, isStaticSched=True, staticPol=policy)
 			envvars['NUM_REPEAT_TRIALS_TO_RUN'] = str(self.numTrials)
 
 			outfileName = self.progname+'-'+self.probSize+'-static-pol' + str(policy)+ 'trials'+str(self.numTrials)+'.txt'
@@ -560,19 +569,22 @@ def main():
 	bestpolicy = None
 	xtimes = []
 	xtime = 1000.0
-	# stop when we find an xtime that beats out the best static xtime
+
+	# just run an infinite loop for now
 	while True:
 		policy, xtime = jobman.iterate()
 		chkpt.add_new_point(policy, xtime)
 		xtimes.append(xtime)
 		print('execution times thus far: ', xtimes)
 		if xtime < bestxtime:
-			print('new best xtime found!', xtime, '\npolicy', policy, '\n', jobman.schedHelper.get_region_dict_from_sched_dict(policy))
+			#print('new best xtime found!', xtime, '\npolicy', policy, '\n', jobman.schedHelper.get_region_dict_from_sched_dict(policy))
+			print('new best xtime found!', xtime, '\npolicy', policy)
 			bestxtime = xtime
 			bestpolicy = policy
 
 	print('finished iterating')
-	print('best xtime and policy', bestxtime, '\npolicy', bestpolicy, '\n', jobman.schedHelper.get_region_dict_from_sched_dict(bestpolicy))
+	#print('best xtime and policy', bestxtime, '\npolicy', bestpolicy, '\n', jobman.schedHelper.get_region_dict_from_sched_dict(bestpolicy))
+	print('best xtime and policy', bestxtime, '\npolicy', bestpolicy) 
 
 	print('Testing complete!')
 	return

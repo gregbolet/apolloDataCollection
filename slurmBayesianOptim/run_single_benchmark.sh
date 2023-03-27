@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1                  # Number of MPI tasks (i.e. processes)
 #SBATCH --nodes=1                    # Maximum number of nodes to be allocated
 #SBATCH --open-mode=truncate
-#SBATCH --partition=pdebug
+#ignore SBATCH --partition=pdebug
 
 # in the sbatch command, specify the 
 # the --output=file 
